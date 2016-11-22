@@ -278,6 +278,105 @@
                 </t>
             </section>
 
+            <section title="JSON Pointer References">
+                <t><cref>
+                    Most of this section's wording is lifted directly from
+                    https://tools.ietf.org/html/draft-luff-relative-json-pointer-00
+                    Not sure how that should be credited?
+                </cref></t>
+                <t>
+                    <xref target="RFC6901">JSON Pointers</xref> are defined only as absolute
+                    pointers starting from the document root.  This specification extends
+                    JSON Pointers with a relative form.  In the same way that <xref target="RFC3986"/>
+                    defines URI References as either a URI or a relative reference,
+                    a JSON Pointer Reference in this specification is either a JSON Pointer
+                    or a relalative JSON Pointer reference.
+                </t>
+                <section title="Syntax">
+                    <t>
+                        A relative JSON Pointer reference is a string of Unicode code points,
+                        comprising a positive integer, followed by either a '#' (%x23)
+                        character or a JSON Pointer (RFC 6901 [RFC6901]).
+                    </t>
+                    <t>
+                        The separation between the integer prefix and the JSON Pointer
+                        will always be unambigious, because a JSON Pointer must be either
+                        zero- length or start with a '/' (%x2F).  Similarly, a JSON
+                        Pointer will never be ambiguous with the '#'.
+                    </t>
+                    <figure>
+                        <artwork align="center">
+<![CDATA[
+     The ABNF syntax of a Relative JSON Pointer is:
+
+relative-json-pointer =  positive-integer &lt;json-pointer&gt;
+relative-json-pointer =/ positive-integer "#"
+positive-integer      =  %x30 / %x31-39 *( %x30-39 )
+        ; "0", or digits without a leading "0"
+]]>
+                        </artwork>
+                        <postamble>
+                            where &lt;json-pointer&gt; follows the production defined in
+                            <xref target="RFC6901">RFC 6901, Section 3</xref> ("Syntax").
+                        </postamble>
+                    </figure>
+                </section>
+                <section title="Evaluation">
+                    <t>
+                        Evaluation of a relative JSON Pointer reference begins with a
+                        reference to a value within a JSON document, and completes with
+                        either a value within that document, a string corresponding to
+                        an object member, or integer value representing an array index.
+                    </t>
+                    <t><cref>Need to describe JSON Pointer base vs current position</cref></t>
+                    <t>
+                        Evaluation begins by processing the positive-integer prefix.  This
+                        can be found by taking the longest continuous sequence of decimal
+                        digits available, starting from the beginning of the string, taking
+                        the decimal numerical value.  If this value is more than zero, then
+                        the following steps are repeated that number of times:
+
+                           If the current referenced value is the root of the document, then
+                           evaluation fails (see below).
+
+                           If the referenced value is an item within an array, then the new
+                           referenced value is that array.
+
+                           If the referenced value is an object member within an object, then
+                           the new referenced value is that object.
+                    </t>
+                    <t>
+                        If the remainder of the Relative JSON Pointer is a JSON Pointer, then
+                        evaluation proceeds as per RFC 6901, Section 4 [RFC6901]
+                        ("Evaluation"), with the modification that the initial reference
+                        being used is the reference currently being held (which may not be
+                        root of the document).
+                    </t>
+                    <t>
+                        Otherwise (when the remainder of the Relative JSON Pointer is the
+                        character '#'), the final result is determined as follows:
+
+                           If the current referenced value is the root of the document, then
+                           evaluation fails (see below).
+
+                           If the referenced value is an item within an array, then the final
+                           evaluation result is the value's index position within the array.
+
+                           If the referenced value is an object member within an object, then
+                           the new referenced value is the corresponding member name.
+                    </t>
+                </section>
+                <section title="Examples">
+                </section>
+                <section title="Non-use in URI Fragment Identifiers">
+                    <t>
+                        Unlike a JSON Pointer, a Relative JSON Pointer can not be used in
+                        a URI fragment identifier.  Such fragments specify exact positions
+                        within a document, and therefore Relative JSON Pointers are not
+                        suitable.
+                    </t>
+                </section>
+            </section>
         </section>
 
         <section title="Fragment identifiers" anchor="fragments">
