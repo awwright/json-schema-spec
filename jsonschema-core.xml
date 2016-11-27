@@ -507,12 +507,56 @@
                 </t>
                 <t>
                     <list style="hanging">
-                        <t hangText="# (document root)">http://example.com/root.json#</t>
-                        <t hangText="#/definitions/A">http://example.com/root.json#foo</t>
-                        <t hangText="#/definitions/B">http://example.com/other.json</t>
-                        <t hangText="#/definitions/B/definitions/X">http://example.com/other.json#bar</t>
-                        <t hangText="#/definitions/B/definitions/Y">http://example.com/t/inner.json</t>
-                        <t hangText="#/definitions/C">urn:uuid:ee564b8a-7a87-4125-8c96-e9f123d6766f</t>
+                        <t hangText="# (document root)">
+                            Base:  http://example.com/root.json
+                            <list>
+                                <t>http://example.com/root.json</t>
+                                <t>http://example.com/root.json#</t>
+                                <t>http://example.com/root.json#/</t>
+                            </list>
+                        </t>
+                        <t hangText="#/definitions/A">
+                            Base:  http://example.com/root.json
+                            <list>
+                                <t>http://example.com/root.json#foo</t>
+                                <t>http://example.com/root.json#/definitions/A</t>
+                            </list>
+                        </t>
+                        <t hangText="#/definitions/B">
+                            Base:  http://example.com/other.json
+                            <list>
+                                <t>http://example.com/other.json</t>
+                                <t>http://example.com/other.json#</t>
+                                <t>http://example.com/other.json#/</t>
+                                <t>http://example.com/root.json#/definitions/B</t>
+                            </list>
+                        </t>
+                        <t hangText="#/definitions/B/definitions/X">
+                            Base:  http://example.com/other.json
+                            <list>
+                                <t>http://example.com/other.json#bar</t>
+                                <t>http://example.com/other.json#/definitions/X</t>
+                                <t>http://example.com/root.json#/definitions/B/definitions/X</t>
+                            </list>
+                        </t>
+                        <t hangText="#/definitions/B/definitions/Y">
+                            Base:  http://example.com/t/inner.json
+                            <list>
+                                <t>http://example.com/t/inner.json</t>
+                                <t>http://example.com/t/inner.json#</t>
+                                <t>http://example.com/t/inner.json#/</t>
+                                <t>http://example.com/other.json#/definitions/Y</t>
+                                <t>http://example.com/root.json#/definitions/B/definitions/Y</t>
+                            </list>
+                        </t>
+                        <t hangText="#/definitions/C">
+                            Base:  urn:uuid:ee564b8a-7a87-4125-8c96-e9f123d6766f
+                            <list>
+                                <t>urn:uuid:ee564b8a-7a87-4125-8c96-e9f123d6766f</t>
+                                <t>urn:uuid:ee564b8a-7a87-4125-8c96-e9f123d6766f#</t>
+                                <t>urn:uuid:ee564b8a-7a87-4125-8c96-e9f123d6766f#/</t>
+                            </list>
+                        </t>
                     </list>
                 </t>
                 <section title="Internal references">
