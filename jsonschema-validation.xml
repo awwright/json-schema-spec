@@ -236,6 +236,25 @@
                 </t>
             </section>
 
+            <section title="Validation and other vocabularies">
+                <t>
+                    Since validation keywords can apply subschemas to child
+                    instances, or determine which of several schemas apply
+                    to an instance, it is expected that most additional
+                    schema vocabularies will build on validation.
+                </t>
+                <t>
+                    Additional vocabularies using validation SHOULD address
+                    how their keywords function when multiple schemas are
+                    combined, or when a schema's validation result is
+                    negated.
+                </t>
+                <t>
+                    It is RECOMMENDED that keywords only take effect in
+                    schemas that are both applicable to and valid against
+                    the instance.
+            </section>
+
         </section>
 
         <section title="Meta-schema">
