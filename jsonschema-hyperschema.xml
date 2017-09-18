@@ -342,6 +342,94 @@
                 (draft-06 version).
             </t>
 
+            <section title="Link context">
+                <t>
+                    In JSON Hyper-Schema, the link's context resource is, by default, the specific
+                    part of the instance that validates against the schema containing the LDO.
+                    This is often not the entire instance document.  This default context can
+                    be changed using the keywords in this section.
+                </t>
+                <t>
+                    Depending on the media type of the instance, it may or may not be possible
+                    to assign a URI to the exact default context resource.  In particular,
+                    application/json does not define URI fragment resolution semantics, so
+                    properties or array elements within a plain JSON document cannot be identified
+                    by a URI.
+                </t>
+                <section title="anchor" anchor="anchor">
+                    <t>
+                        This property sets the context URI of the link.  The value of the property
+                        MUST be resolved as a <xref target="RFC3986">URI-reference</xref> against
+                        the base URI of the instance.
+                    </t>
+                </section>
+                <section title="anchorPointer" anchor="anchorPointer">
+                    <t>
+                        This property changes the point within the instance that is considered
+                        to be the context resource of the link.  The value of the property MUST
+                        be a valid JSON Pointer in JSON String representation form as per
+                        <xref target="RFC6901">RFC 6901, section 5</xref>, or a valid 
+                        <xref target="I-D.luff-relative-json-pointer">Relative JSON Pointer</xref>
+                        which is evaluated relative to the default context.
+                    </t>
+                    <t>
+                        While an alternate context with a known URI is best set with the
+                        <xref target="anchor">"anchor"</xref> keyword, the lack of a fragment
+                        identifier syntax for application/json means that it is usually not
+                        possible to change the context within a JSON instance using a URI.
+                    </t>
+                    <t>
+                        Even in "+json" media types that define JSON Pointer as a fragment
+                        identifier syntax, if the default context is nested within an array,
+                        it is not possible to obtain the index of the default context's position
+                        in that array in order to construct a pointer to another property in that
+                        same nested JSON object.  This will be demonstrated in the examples.
+                    </t>
+                </section>
+            </section>
+            <section title="Link relation type">
+                <t>
+                </t>
+                <section title="rel">
+                </section>
+            </section>
+            <section title="Link target">
+                <t>
+                </t>
+                <section title="href" anchor="href">
+                </section>
+                <section title="hrefPointers" anchor="hrefPointers">
+                </section>
+                <section title="hrefRequired" anchor="hrefRequired">
+                </section>
+            </section>
+            <section title="Link target attributes">
+                <t>
+                </t>
+                <section title="title">
+                </section>
+                <section title="description">
+                </section>
+                <section title="targetSchema">
+                </section>
+                <section title="targetHints">
+                </section>
+                <section title="targetMediaType">
+                </section>
+            </section>
+            <section title="Link input">
+                <t>
+                </t>
+                <section title="hrefSchema">
+                </section>
+                <section title="targetSchema">
+                </section>
+                <section title="submissionMediaType">
+                </section>
+                <section title="submissionSchema">
+                </section>
+            </section>
+
             <section title="Links, operations, and data">
                 <t>
                     <cref>
