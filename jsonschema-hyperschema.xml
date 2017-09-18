@@ -13,6 +13,7 @@
 <!ENTITY rfc6901 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.6901.xml">
 <!ENTITY rfc7231 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.7231.xml">
 <!ENTITY rfc7240 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.7240.xml">
+<!ENTITY I-D.nottingham-rfc5988bis SYSTEM "https://xml2rfc.tools.ietf.org/public/rfc/bibxml3/reference.I-D.draft-nottingham-rfc5988bis-08.xml">
 <!ENTITY I-D.luff-relative-json-pointer SYSTEM "https://xml2rfc.tools.ietf.org/public/rfc/bibxml3/reference.I-D.draft-luff-relative-json-pointer-00.xml">
 <!ENTITY I-D.reschke-http-jfv SYSTEM "https://xml2rfc.tools.ietf.org/public/rfc/bibxml3/reference.I-D.draft-reschke-http-jfv-06.xml">
 ]>
@@ -307,11 +308,31 @@
 
         <section title="Link Description Object">
             <t>
-                A Link Description Object (LDO) is used to describe a single link relation from the
-                instance to another resource.
-                A Link Description Object must be an object.
+                <cref>
+                    This section references the work-in-progress RFC5988bis, with the expectation
+                    that it will reach RFC before this specification does.
+                </cref>
+                A Link Description Object (LDO) is a serialization of the abstract link model
+                defined in <xref target="I-D.nottingham-rfc5988bis">RFC 5988bis, section 2</xref>.
+                As described in that document, a link consists of a context, a relation type,
+                a target, and optionally target attributes.  JSON Hyper-Schema's LDO provides
+                all of these, along with additional features using JSON Schema to describe input
+                for use with the links in various ways.
             </t>
-
+            <t>
+                Each keyword is covered briefly in this section, with additional usage explanation
+                and comprehensive examples given later in the document.
+            </t>
+            <t>
+                Note that due to the use of URI Templates to identify link targets, as well as
+                further use of client input, an LDO is a link template that may resolve to multiple
+                links when used with a JSON instance document.
+            </t>
+            <t>
+                A Link Description Object MUST be an object, and the
+                <xref target="href">"href"</xref> and <xref target="rel">"rel"</xref> properties
+                MUST be present.
+            </t>
             <t>
                 The link description format can be used without JSON Schema, and use of this format
                 can be declared by referencing the normative link description schema as the schema
@@ -1669,6 +1690,7 @@ GET /foo/
             &rfc6573;
             &rfc7231;
             &rfc7240;
+            &I-D.nottingham-rfc5988bis;
         </references>
 
         <section title="Acknowledgments">
