@@ -389,8 +389,66 @@
             </section>
             <section title="Link relation type">
                 <t>
+                    The link's relation type identifies its semantics.
+                </t>
+                <t>
+                    Relationship definitions are not normally media type
+                    dependent, and users are encouraged to utilize the most
+                    suitable existing accepted relation definitions.
                 </t>
                 <section title="rel">
+                    <t>
+                        The value of this property MUST be a string, and MUST be a single
+                        Link Relation Type as defined in RFC 5988bis, Section 2.1.
+                    </t>
+                    <t>
+                        This property is required.
+                    </t>
+                </section>
+                <section title='"self" links'>
+                    <t>
+                        SHOULD be fulfillable from the instance.
+                        SHOULD NOT allow input with "hrefSchema".
+                    </t>
+                </section>
+                <section title='"collection" and "item" links'>
+                    <t>
+                        <xref target="RFC6573">RFC 6573</xref> defines and registers
+                        the "item" and "collection" link relations.  A well-known design pattern
+                        in hypermedia is to use a collection resource to create a member of the
+                        collection and give it a server-assigned URI.  When using HTTP, or a protocol
+                        such as CoAP that is explicitly analogous to HTTP, this is done by POST-ing
+                        a representation of the individual resource to be created to the collection
+                        resource.
+                    </t>
+                    <t>
+                        Resources that are the target of a "collection" link using HTTP or an analogous
+                        protocol in JSON Hyper-Schema MUST NOT assign semantics other than resource
+                        creation to POST (or the analogous method in non-HTTP protocols).
+                    </t>
+                    <t>
+                        The <xref target="submissionSchema">"submissionSchema"</xref> field for the
+                        link SHOULD be identical to the schema of the representations of the
+                        collection's items, as indicated by the "item" link.  RFC 6573 identifies
+                        the "collection" and "item" link relation types as reciprocal, so the
+                        context resource of an "item" link MAY be treated as a collection, even if
+                        no explicit "collection" link is defined.
+                    </t>
+                </section>
+                <section title="Using extension relation types">
+                    <t>
+                        When no registered relation (aside from "related") applies, users are
+                        encouraged to mint their own extension relation types, as described in
+                        <xref target="RFC5988">section 4.2 of RFC 5988</xref>.  The simplest
+                        approaches for choosing link relation type URIs are to either use
+                        a URI scheme that is already in use to identify the system's primary
+                        resources, or to use a human-readable, non-dereferenceable URI scheme
+                        such as <xref target="RFC4151">"tag", defined by RFC 4151</xref>.
+                    </t>
+                    <t>
+                        Extension relation type URIs need not be dereferenceable, even when
+                        using a scheme that allows it.
+                    </t>
                 </section>
             </section>
             <section title="Link target">
@@ -549,7 +607,7 @@
 
             <!-- Possibly include a short section on motivations, including triples, resources, and progressive disclosure -->
 
-            <section title="href" anchor="href">
+            <section title="href1" anchor="href1">
                 <t>
                     The value of the "href" link description property is a template used to
                     determine the target URI of the related resource.
@@ -669,7 +727,7 @@
 
             </section>
 
-            <section title="hrefPointers" anchor="hrefPointers">
+            <section title="hrefPointers1" anchor="hrefPointers1">
                 <t>
                     The value of the "hrefPointers" link description property MUST be
                     an object.  Each property value in the object MUST be a valid
@@ -865,7 +923,7 @@
                 </t>
             </section>
 
-            <section title="hrefRequired" anchor="hrefRequired">
+            <section title="hrefRequired1" anchor="hrefRequired1">
                 <t>
                     The value of this keyword MUST be an array, and the elements MUST be unique.
                     Each element SHOULD match a variable in the link's URI Template, without
@@ -1135,7 +1193,7 @@ GET /foo/
                 </section>
             </section>
 
-            <section title="anchor" anchor="anchor">
+            <section title="anchor1" anchor="anchor1">
                 <t>
                     This property sets the context URI of the link.
                     The value of the property MUST be resolved as a
@@ -1144,7 +1202,7 @@ GET /foo/
                 </t>
             </section>
 
-            <section title="anchorPointer" anchor="anchorPointer">
+            <section title="anchorPointer1" anchor="anchorPointer1">
                 <t>
                     This property changes the point within the instance that is considered
                     to be the context resource of the link.  The value of the property MUST be a
