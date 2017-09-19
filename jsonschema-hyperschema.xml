@@ -97,7 +97,8 @@
             </t>
             <t>
                 The term JSON Hyper-Schema is used to refer to a JSON Schema that uses these
-                keywords.
+                keywords.  The term "hyper-schema" on its own refers to a JSON Hyper-Schema
+                within the scope of this specification.
             </t>
 
             <t>
@@ -130,15 +131,27 @@
                 style, enable the creation of generic user agents.  Such a user agent
                 has no application-specific knowledge.  Rather, it understands pre-defined
                 media types, URI schemes, protocols, and link relations, often by recognizing
-                these and coordinating the use of libraries that implement them.
+                these and coordinating the use of existing software that implement support
+                for them.
             </t>
             <t>
                 JSON Hyper-Schema makes it possible to build hypermedia systems from JSON
-                documents, and programmatic user agents than can navidate them.  The combination
-                of a JSON instance document and a valid hyper-schema for that instance behaves
-                as a single hypermedia document.  By allowing this separation, hyper-schema-based
-                systems can gracefully support clients that expect plain JSON, while providing
-                full hypermedia capabilities for JSON Hyper-Schema-aware user agents.
+                documents.  The combination of a JSON instance document and a valid
+                application/schema+json hyper-schema for that instance behaves
+                as a single hypermedia document.  By allowing this separation,
+                hyper-schema-based systems can gracefully support clients that expect
+                plain JSON, while providing full hypermedia capabilities for hyper-schema-aware
+                user agents.
+            </t>
+            <t>
+                User agents can detect the presence of hyper-schema by looking for the
+                application/schema+json media type and a "$schema" value that indicates the
+                presence of the hyper-schema vocabulary.  The client-side user agent can then
+                present an interface that abstracts away the concept of two documents, and
+                allows the same manner of interaction as a single-document hypermedia format.
+                This allows a resource to present a JSON + JSON Hyper-Schema representation
+                alongside single-document hypermedia representations with equal functionality
+                through user agents.
             </t>
             <t>
                 JSON Hyper-Schema can also be used on the server side to generate other
