@@ -124,6 +124,64 @@
             </t>
         </section>
 
+        <section title="Implementation">
+            <t>
+                Hypermedia systems, which follow the constraints of the REST architectural
+                style, enable the creation of generic user agents.  Such a user agent
+                has no application-specific knowledge.  Rather, it understands pre-defined
+                media types, URI schemes, protocols, and link relations, often by recognizing
+                these and coordinating the use of libraries that implement them.
+            </t>
+            <t>
+                JSON Hyper-Schema makes it possible to build hypermedia systems from JSON
+                documents, and programmatic user agents than can navidate them.  Starting
+                from a JSON instance document with an identified hyper-schema, the user agent
+                can provide an interface to select available links, and either transition
+                to the target resource or send it data for processing.  Both types of operations
+                can involve input from the client application which drives the user agent.
+                The client application may itself get this information from either a programmatic
+                or interactive source.
+            </t>
+            <t>
+                * Construct the target link based on runtime instance data
+                * Describe possible input for various uses
+                * Pre-populate input with instance data
+            </t>
+            <t>
+                * Single resource at a time
+                * Not about connecting resources or explaining response codes
+                * Not about non-media(or what?) concerns such as auth
+            </t>
+            <t>
+                * Hyper-Schema implementation is like an (hypermedia-format?) Library
+                * XML-driven hypermedia user agents?  Is that a thing?  HAL?
+                * application/[*+]json &amp; application/schema+json == one hypermedia document.
+                * Random thought: runtime self-describing schemas with inline data.
+            </t>
+            <t>
+                The primary form that an implementation of JSON Hyper-Schema will take is that
+                of a programmatic user agent.  This user agent's awareness of the
+                application/schema+json media type (with the Hyper-Schema vocabulary),
+                and the optional application/schema-instance+json media type, combined with
+                awareness of various existing URI schemes, protocols, and link relation types,
+                will allow interacting with JSON-based data as hypermedia.
+            </t>
+            <t>
+                The ability to build a generic user agent depends on the hypermedia system
+                following the constraints of the REST architectural style.  In particular,
+                the user agent maintains the ?low-level? application state referred to
+                in the "hypermedia as the engine of application state" constraint, typically
+                abbreviated as HATEOAS.
+            </t>
+            <t>
+                Blah blah user agent as a cursor...
+            </t>
+            <t>
+                A wide variety of additional programs, known as client applications, can be built
+                on top of this user agent.  Such programs include but are not limited to an
+                interactive hypermedia browser, domain-specific applications, [etc....???]
+            </t>
+        </section>
         <section title="Overview">
             <t>
                 This document describes how JSON Schema can be used to define hyperlinks on instance
