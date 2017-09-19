@@ -134,8 +134,34 @@
             </t>
             <t>
                 JSON Hyper-Schema makes it possible to build hypermedia systems from JSON
-                documents, and programmatic user agents than can navidate them.  Starting
-                from a JSON instance document with an identified hyper-schema, the user agent
+                documents, and programmatic user agents than can navidate them.  The combination
+                of a JSON instance document and a valid hyper-schema for that instance behaves
+                as a single hypermedia document.  By allowing this separation, hyper-schema-based
+                systems can gracefully support clients that expect plain JSON, while providing
+                full hypermedia capabilities for JSON Hyper-Schema-aware user agents.
+            </t>
+            <t>
+                JSON Hyper-Schema can also be used on the server side to generate other
+                link serializations at runtime, such as HTTP Link headers, as long as the
+                instance media type supports producing the appropriate
+                <xref target="context">link context URIs</xref> for any links that do not
+                use the entire instance as their context.
+            </t>
+            <t>
+                It is important to emphasize that JSON Hyper-Schema is designed to work
+                with one hypermedia document at a time, just as a web browser works with
+                one HTML document at a time.  A web browser does not have any concept of
+                which HTML documents (and related resources) form a "web site", so neither
+                does a JSON Hyper-Schema user agent have any concept of which JSON instance
+                and schema documents form an "API" or other larger unit.
+                <cref>
+                    The JSON Schema API Documentation vocabulary is a proposed vocabulary
+                    for documenting whole APIs, particularly hypermedia APIs that are not
+                    well suited to existing documentation systems.
+                </cref>
+            </t>
+            <t>
+                Starting from a JSON instance document with an identified hyper-schema, the user agent
                 can provide an interface to select available links, and either transition
                 to the target resource or send it data for processing.  Both types of operations
                 can involve input from the client application which drives the user agent.
@@ -400,7 +426,7 @@
                 (draft-06 version).
             </t>
 
-            <section title="Link context">
+            <section title="Link context" anchor="context">
                 <t>
                     In JSON Hyper-Schema, the link's context resource is, by default, the specific
                     part of the instance that validates against the schema containing the LDO.
