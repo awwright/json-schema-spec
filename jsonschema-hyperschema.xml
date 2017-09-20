@@ -135,7 +135,7 @@
                 media types, URI schemes, protocols, and link relations, often by recognizing
                 these and coordinating the use of existing software that implement support
                 for them.  Applications can then be built on top of such a user agent, focusing
-                on their own semantics and logic rather than the mechanics or the interactions.
+                on their own semantics and logic rather than the mechanics of the interactions.
             </t>
             <t>
                 JSON Hyper-Schema makes it possible to build hypermedia systems from JSON
@@ -157,6 +157,12 @@
                     alongside single-document hypermedia representations with equal functionality
                     available through user agents.
                 </t>
+                <t>
+                    Hyper-schemas allow representations to take up fewer bytes on the wire, and
+                    distributes the burden of link construction from the server to each client.
+                    A user agent need not construct a link unless a client application requests
+                    that link.
+                </t>
             </section>
             <section title="Server-side link construction">
                 <t>
@@ -165,7 +171,7 @@
                     <xref target="I-D.kelly-json-hal">JSON HAL</xref>.  As hyper-schema offers
                     a superset of the features of many other systems, using it on the server
                     can make it easier to support multiple representation media types and
-                    linking mechanisms.  It is even possible to support features like JSON HAL's
+                    linking mechanisms.  It is even possible to support features such as JSON HAL's
                     embedded resources by automatically following links on the server and
                     inlining the results.
                 </t>
@@ -183,48 +189,33 @@
                     and representation data fields.
                 </t>
             </section>
-            <section title="Single resource scope">
+            <section title="Using JSON Hyper-Schema in APIs">
                 <t>
-                    It is important to emphasize that JSON Hyper-Schema is designed to work
-                    with one hypermedia resource at a time, just as a web browser works with
-                    one HTML page at a time.  A web browser does not have any concept of
-                    which HTML documents (and related resources) form a "web site", so neither
-                    does a JSON Hyper-Schema user agent have any concept of which JSON instance
-                    and schema documents form an "API" or other larger unit.
+                    JSON Hyper-Schema is ideal for representing individual resources in hypermedia
+                    APIs.  It offers comprehensive capabilities for describing how to use hyperlinks
+                    to interact with the current resource (through "self" links), or related
+                    resources.  Using a hyper-schema-based API involves traversing links from
+                    one resource to the next, interacting with resources through their
+                    representations as described by the target keywords, or submitting data
+                    to resources for processing using the submission keywords.
+                </t>
+                <t>
+                    Hyper-schema is only concerned with one resource and set of associated links
+                    at a time.  Just as a web browser works with only one HTML page at a time,
+                    with no concept of whether or how that page functions as part of a "site",
+                    a hyper-schema-aware user agent works with one resource at a time, without
+                    any concept of whether or how that resource fits into an API.
+                </t>
+                <t>
+                    While aspects of cross-cutting API concerns such as authentication
+                    and authorization may be described in hyper-schema, for instance in
+                    the headerSchema of a link, defining an API-wide approach to any
+                    cross-cutting concerns is beyond the scope of hyper-schema.
                     <cref>
                         The JSON Schema API Documentation vocabulary is a proposed vocabulary
                         for documenting whole APIs, particularly hypermedia APIs that are not
                         well suited to existing documentation systems.
                     </cref>
-                </t>
-                <t>
-                    A user agent provides an interface to a single resource and its links.
-                    Based on information in the combined instance and hyper-schema
-                    representation the user agent may be able to offer resource creation,
-                    editing, replacement, deletion, or resource-defined data processing
-                    operations.  These operations may be detectable directly from the hyper-schema,
-                    or may be attempted at runtime.  Note that operations described in the
-                    hyper-schema may be unavailable at runtime depending on the system's state,
-                    user permissions, or other conditions.  This is expressed in operation
-                    responses, as prescribed by the protocol being used for communication.
-                </t>
-                <t>
-                    The primary way for a user agent to present, or a client application to
-                    select a link on which to perform an operation is by the
-                    <xref target="relationType">link relation type</xref>.
-                </t>
-                <t>
-                    ...and either transition
-                    to the target resource or send it data for processing.  Both types of operations
-                    can involve input from the client application which drives the user agent.
-                    The client application may itself get this information from either
-                    a programmatic or interactive source.
-                </t>
-            </section>
-            <section title="JSON Hyper-Schema and APIs">
-                <t>
-                    * Not about connecting resources or explaining response codes
-                    * Not about non-media(or what?) concerns such as auth
                 </t>
             </section>
             <section title="misc">
