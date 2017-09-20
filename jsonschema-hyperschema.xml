@@ -15,6 +15,7 @@
 <!ENTITY rfc7240 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.7240.xml">
 <!ENTITY I-D.nottingham-rfc5988bis SYSTEM "https://xml2rfc.tools.ietf.org/public/rfc/bibxml3/reference.I-D.draft-nottingham-rfc5988bis-08.xml">
 <!ENTITY I-D.luff-relative-json-pointer SYSTEM "https://xml2rfc.tools.ietf.org/public/rfc/bibxml3/reference.I-D.draft-luff-relative-json-pointer-00.xml">
+<!ENTITY I-D.kelly-json-hal SYSTEM "https://xml2rfc.tools.ietf.org/public/rfc/bibxml3/reference.I-D.draft-kelly-json-hal-08.xml">
 <!ENTITY I-D.reschke-http-jfv SYSTEM "https://xml2rfc.tools.ietf.org/public/rfc/bibxml3/reference.I-D.draft-reschke-http-jfv-06.xml">
 ]>
 <?rfc toc="yes"?>
@@ -132,13 +133,14 @@
                 has no application-specific knowledge.  Rather, it understands pre-defined
                 media types, URI schemes, protocols, and link relations, often by recognizing
                 these and coordinating the use of existing software that implement support
-                for them.
+                for them.  Applications can then be built on top of such a user agent, focusing
+                on their own semantics and logic rather than the mechanics or the interactions.
             </t>
             <t>
                 JSON Hyper-Schema makes it possible to build hypermedia systems from JSON
                 documents.  The combination of a JSON instance document and a valid
                 application/schema+json hyper-schema for that instance behaves
-                as a single hypermedia document.  By allowing this separation,
+                as a single hypermedia representation.  By allowing this separation,
                 hyper-schema-based systems can gracefully support clients that expect
                 plain JSON, while providing full hypermedia capabilities for hyper-schema-aware
                 user agents.
@@ -152,23 +154,32 @@
                     allows the same manner of interaction as a single-document hypermedia format.
                     This allows a resource to present a JSON plus JSON Hyper-Schema representation
                     alongside single-document hypermedia representations with equal functionality
-                    through user agents.
+                    available through user agents.
                 </t>
             </section>
             <section title="Server-side link construction">
                 <t>
                     JSON Hyper-Schema can also be used on the server side to generate other
-                    link serializations at runtime, such as HTTP Link headers, as long as the
-                    instance media type supports producing the appropriate
-                    <xref target="context">link context URIs</xref> for any links that do not
-                    use the entire instance as their context.
+                    link serializations at runtime, such as HTTP Link headers or
+                    <xref target="I-D.kelly-json-hal">JSON HAL</xref>.  As hyper-schema offers
+                    a superset of the features of many other systems, using it on the server
+                    can make it easier to support multiple representation media types and
+                    linking mechanisms.  It is even possible to support features like JSON HAL's
+                    embedded resources by automatically following links on the server and
+                    inlining the results.
                 </t>
             </section>
             <section title="Client applications">
                 <t>
                     Most uses of hyper-schema will be in the service of an application.  In
                     particular, the client side of the application can be built on top of the
-                    generic user agent.
+                    generic user agent.  While the user agent will understand how to use a few
+                    standardized link relation types described here, such as
+                    the <xref target="self">"self"</xref> relation and the paired
+                    <xref target="collectionAndItem">"collection" and "item"</xref> relations,
+                    the client application contains the knowledge of
+                    <xref target="extensionRelationTypes">application-specific link relation types</xref>
+                    and representation data fields.
                 </t>
             </section>
             <section title="Single resource scope">
@@ -515,13 +526,13 @@
                         This property is required.
                     </t>
                 </section>
-                <section title='"self" links'>
+                <section title='"self" links' anchor="self">
                     <t>
                         SHOULD be fulfillable from the instance.
                         SHOULD NOT allow input with "hrefSchema".
                     </t>
                 </section>
-                <section title='"collection" and "item" links'>
+                <section title='"collection" and "item" links' anchor="collectionAndItem">
                     <t>
                         <xref target="RFC6573">RFC 6573</xref> defines and registers
                         the "item" and "collection" link relations.  A well-known design pattern
@@ -545,7 +556,7 @@
                         no explicit "collection" link is defined.
                     </t>
                 </section>
-                <section title="Using extension relation types">
+                <section title="Using extension relation types" anchor="extensionRelationTypes">
                     <t>
                         When no registered relation (aside from "related") applies, users are
                         encouraged to mint their own extension relation types, as described in
@@ -1947,6 +1958,7 @@ GET /foo/
             &rfc7231;
             &rfc7240;
             &I-D.nottingham-rfc5988bis;
+            &I-D.kelly-json-hal;
         </references>
 
         <section title="Acknowledgments">
