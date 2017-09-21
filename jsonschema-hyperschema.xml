@@ -165,11 +165,15 @@
                 plain JSON, while providing full hypermedia capabilities for hyper-schema-aware
                 user agents.
             </t>
-            <section title="User agents and client-side link construction">
-                <t>
-                    User agents can detect the presence of hyper-schema by looking for the
-                    application/schema+json media type and a "$schema" value that indicates the
-                    presence of the hyper-schema vocabulary.  The client-side user agent can then
+            <t>
+                User agents can detect the presence of hyper-schema by looking for the
+                application/schema+json media type and a "$schema" value that indicates the
+                presence of the hyper-schema vocabulary.  A user agent can then use an
+                implementation of JSON Hyper-Schema to provide an interface to the
+                schema and instance documents as a representation of a single resource.
+            </t>
+            </t>
+                The client-side user agent can then
                     present an interface that abstracts away the concept of two documents, and
                     allows the same manner of interaction as a single-document hypermedia format.
                     This allows a resource to present a JSON plus JSON Hyper-Schema representation
@@ -318,6 +322,13 @@
                     appropriate fragment.  This requirement includes determining the
                     correct base URI when the context is provided as a relative reference.
                 </t>
+                <t hangText="Link relation types">
+                    Implementations MUST recognize a link with a "self" relation typd as
+                    describing the possible interactions with the resource represented by
+                    the instance data.  Collections MUST be recognized based on traversing
+                    a "collection" link, and MAY be recognized based on the presence of
+                    an "item" link which has as its context the instance or a sub-instance.
+                </t>
                 <t hangText="Target identification">
                     For a given link, an implementation MUST be able to construct the
                     target IRI or URI based on the instance and, if "hrefSchema" is present,
@@ -343,19 +354,6 @@
             JSON Schema validation, serializing payloads based on media types, and
             communicating with resource via protocols as indicated by URI schemes.
         </t>
-<!--
-        <section title="Link applicability">
-        </section>
-        <section title="Link context identification">
-        </section>
-        <section title="Link target identification">
-        </section>
-        <section title="Accepting input for use with a link">
-        </section>
-        <section title="Making use of link target attributes">
-        </section>
-  -->
-
         <section title="Schema keywords">
             <section title="Interaction with validation">
                 <t>
