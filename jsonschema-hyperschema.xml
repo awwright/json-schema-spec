@@ -158,35 +158,38 @@
                     available through user agents.
                 </t>
                 <t>
+                    In addition to accessing links by their <xref="relationType">link relation type,
+                    user agents can expose information about what input is allowed for use
+                    with the link, and for input used to construct the target URI, pre-populate
+                    the input based on the instance data.
+                </t>
+                <t>
                     Hyper-schemas allow representations to take up fewer bytes on the wire, and
-                    distributes the burden of link construction from the server to each client.
+                    distribute the burden of link construction from the server to each client.
                     A user agent need not construct a link unless a client application requests
                     that link.
+                </t>
+                <t>
+                    A conforming user-agent SHOULD be able to construct a link target URI given
+                    the hyper-schema, the relation type of the link, the instance data, and any
+                    relevant client input.  Link relation types that are used for multiple links
+                    may be disambiguated either by the position within the instance data (for
+                    instance when each element in an array has an "item" link), or by examining
+                    additional information such as the link's title.  It is NOT RECOMMENDED to
+                    disambiguate links based on the target URI, as this introduces coupling
+                    between the client application and the server-controlled URI namespace.
                 </t>
             </section>
             <section title="Server-side link construction">
                 <t>
                     JSON Hyper-Schema can also be used on the server side to generate other
                     link serializations at runtime, such as HTTP Link headers or
-                    <xref target="I-D.kelly-json-hal">JSON HAL</xref>.  As hyper-schema offers
+                    <xref target="I-D.kelly-json-hal">JSON HAL</xref>.  Because hyper-schema offers
                     a superset of the features of many other systems, using it on the server
                     can make it easier to support multiple representation media types and
                     linking mechanisms.  It is even possible to support features such as JSON HAL's
                     embedded resources by automatically following links on the server and
                     inlining the results.
-                </t>
-            </section>
-            <section title="Client applications">
-                <t>
-                    Most uses of hyper-schema will be in the service of an application.  In
-                    particular, the client side of the application can be built on top of the
-                    generic user agent.  While the user agent will understand how to use a few
-                    standardized link relation types described here, such as
-                    the <xref target="self">"self"</xref> relation and the paired
-                    <xref target="collectionAndItem">"collection" and "item"</xref> relations,
-                    the client application contains the knowledge of
-                    <xref target="extensionRelationTypes">application-specific link relation types</xref>
-                    and representation data fields.
                 </t>
             </section>
             <section title="Using JSON Hyper-Schema in APIs">
@@ -211,31 +214,96 @@
                     and authorization may be described in hyper-schema, for instance in
                     the headerSchema of a link, defining an API-wide approach to any
                     cross-cutting concerns is beyond the scope of hyper-schema.
+                </t>
+                <t>
+                    To create an entry point for an API, it is RECOMMENDED to create
+                    a resource ?at a well-known URI? with the minimal amount of data
+                    (potentially none) necessary to begin interacting with API resources.
+                    The hyper-schema for this resource SHOULD contain links to all
+                    API resources that can be accessed with only user input and/or
+                    data contained in the entry point representation.
+                </t>
+                <t>
+                    As hyper-schema represents a single resource at a time, it does not
+                    provide for an enumeration of all possible responses to protocol operations
+                    performed with links.  Each response, including errors, should identify its
+                    own hyper-schema to allow the user agent to interpret any information that
+                    is provided beyond the protocol's own status reporting.
+                </t>
+            </section>
+            <section title="Client applications">
+                <t>
+                    Most uses of hyper-schema will be in the service of an application, often
+                    backed by one or more application-specific APIs.  In particular, the client
+                    side of an application can be built on top of the hyper-schema-aware generic
+                    user agent.  While the user agent will understand how to use a few
+                    standardized link relation types described here, such as
+                    the <xref target="self">"self"</xref> relation and the paired
+                    <xref target="collectionAndItem">"collection" and "item"</xref> relations,
+                    the client application contains the knowledge of
+                    <xref target="extensionRelationTypes">application-specific link relation types</xref>
+                    and representation data fields.
+                </t>
+            </section>
+            <section title="Static analysis of hyper-schemas">
+                <t>
+                    It is possible to statically analyze a set of hyper-schemas without instance
+                    data in order to generate output such as documentation or code.  However,
+                    the full feature set of both validation and hyper-schema cannot be accessed
+                    without runtime instance data.
+                </t>
+                <t>
+                    This is an intentional design choice to provide the maximum runtime
+                    flexibility for hypermedia systems.  JSON Schema as a media type allows for
+                    establishing additional vocabularies for static analysis and content
+                    generation, which are not addressed in this specification.  Additionally,
+                    individual systems may restrict their usage to subsets that can be
+                    analyzed statically if full design-time description is a goal.
                     <cref>
-                        The JSON Schema API Documentation vocabulary is a proposed vocabulary
-                        for documenting whole APIs, particularly hypermedia APIs that are not
-                        well suited to existing documentation systems.
+                        Vocabularies for API documentation and other purposes have been
+                        proposed, and contributions are welcome at
+                        https://github.com/json-schema-org/json-schema-vocabularies
                     </cref>
                 </t>
             </section>
-            <section title="misc">
-                <t>
-                    * Construct the target link based on runtime instance data
-                    * Describe possible input for various uses
-                    * Pre-populate input with instance data
-                </t>
-                <t>
-                    * Hyper-Schema implementation is like an (hypermedia-format?) Library
-                    * XML-driven hypermedia user agents?  Is that a thing?  HAL?
-                    * application/[*+]json &amp; application/schema+json == one hypermedia document.
-                    * Random thought: runtime self-describing schemas with inline data.
-                </t>
-                <t>
-                    A wide variety of additional programs, known as client applications, can be
-                    built on top of this user agent.  Such programs include but are not limited
-                    to an interactive hypermedia browser, domain-specific applications, [etc....???]
-                </t>
-            </section>
+        </section>
+        <section title="Implementation requirements">
+            <t>
+            * MUST be able to deterimine which links apply to a given (sub)instance.
+                * By validation outcomes (including hyper-schems-specific interactions)
+                * By "hrefRequired"
+            * MUST be able to determine the correct instance base URI
+                * From request URI
+                * Overridden by "base", no template variables
+                * Overridden by "base" with template variables
+            * MUST be able to construct target URI references
+                * Based on instance data
+                * Based on input
+                * Based on input pre-populated from instance data
+            * MUST be able to construct full target URI (combining the above two)
+            * MUST be able to identify the link context
+                * Default context (URI or URI plus absolute pointer if no fragment is available)
+                * From anchor URI
+                * From anchorPointer (URI or URI plus absolute pointer if no fragment is availalbe)
+            * MUST provide access to each keyword and its value
+            * MUST validate each type of input against the correct schema
+            * SHOULD identify collections due to traversing a "collection" link
+            * MAY idenentify collections by finding an "item" link with the current context
+                * MAY have a limit on link serach depth
+            * SHOULD understand a minimal set of HTTP "targetHints"
+                * "allow"
+                * "accept-patch"
+                * ???
+            * MUST correctly set request Content-Type for HTTP (and similar?)
+                * "targetMediaType"
+                * "submissionMediaType"
+                * "accept-patch" (see also "targetHints")
+            * SHOULD set "accept"?
+                * based on "targetMediaType"?
+                * based on "headerSchema"?
+            * SHOULD be able to serialize a minimal set of HTTP "headerSchema"
+                * "accept"?
+            </t>
         </section>
         <section title="Overview">
             <t>
