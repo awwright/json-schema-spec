@@ -127,6 +127,25 @@
             </t>
         </section>
 
+        <section title="Overview">
+            <t>
+                This document describes how JSON Schema can be used to define hyperlinks on instance
+                data.
+            </t>
+            <t>
+                As with all JSON Schema keywords, all the keywords described in the "Schema
+                Keywords" section are optional. The minimal valid JSON Hyper-schema is the blank
+                object.
+            </t>
+        </section>
+
+        <section title="Meta-schema">
+            <t>
+                The current URI for the JSON Hyper-Schema meta-schema is
+                &lt;http://json-schema.org/draft-06/hyper-schema#&gt;.
+            </t>
+        </section>
+
         <section title="Purpose">
             <t>
                 Hypermedia systems, which follow the constraints of the REST architectural
@@ -267,97 +286,77 @@
                 </t>
             </section>
         </section>
-        <section title="Implementation requirements">
-            <t>
-            * MUST be able to deterimine which links apply to a given (sub)instance.
-                * By validation outcomes (including hyper-schems-specific interactions)
-                * By "hrefRequired"
-            * MUST be able to determine the correct instance base URI
-                * From request URI
-                * Overridden by "base", no template variables
-                * Overridden by "base" with template variables
-            * MUST be able to construct target URI references
-                * Based on instance data
-                * Based on input
-                * Based on input pre-populated from instance data
-            * MUST be able to construct full target URI (combining the above two)
-            * MUST be able to identify the link context
-                * Default context (URI or URI plus absolute pointer if no fragment is available)
-                * From anchor URI
-                * From anchorPointer (URI or URI plus absolute pointer if no fragment is availalbe)
-            * MUST provide access to each keyword and its value
-            * MUST validate each type of input against the correct schema
-            * SHOULD identify collections due to traversing a "collection" link
-            * MAY idenentify collections by finding an "item" link with the current context
-                * MAY have a limit on link serach depth
-            * SHOULD understand a minimal set of HTTP "targetHints"
-                * "allow"
-                * "accept-patch"
-                * ???
-            * MUST correctly set request Content-Type for HTTP (and similar?)
-                * "targetMediaType"
-                * "submissionMediaType"
-                * "accept-patch" (see also "targetHints")
-            * SHOULD set "accept"?
-                * based on "targetMediaType"?
-                * based on "headerSchema"?
-            * SHOULD be able to serialize a minimal set of HTTP "headerSchema"
-                * "accept"?
-            </t>
+    </section>
+    <section title="General implementation requirements">
+        <t>
+            A JSON Hyper-Schema implementation is able to take a hyper-schema, an
+            instance, and optionally an identification of a location within the instance
+            (such as a JSON Pointer or a URI fragment appropriate for the media type),
+            and produce information about any links that apply to that location.
+            This information is returned in the form of URIs and/or JSON Pointers.
+            Additionally, some fields are intended for direct use by client applications.
+        </t>
+        <t>
+            At a high level, a conforming implementation will meet the following requirements.
+            Each of these requirements is covered in more detail in the individual keyword
+            sections and keyword group overviews.
+            <list style="hanging">
+                <t hangText="Link discovery">
+                    An implementation MUST find and make accessible all links in
+                    all (sub)schemas against which this (sub)instance is valid.
+                    These links MUST all be presented as a single set, regardless
+                    of the number of subschemas involved.  Links that cannot fulfill
+                    their "hrefRequired" keyword based on the instance and/or potential
+                    client input MUST be excluded.
+                </t>
+                <t hangText="Context identification">
+                    For a given link, an implementation MUST be able to identify the
+                    link's context.  The identifier MUST either be an IRI or URI
+                    that fully identifies the context, or an IRI or URI together
+                    with a JSON Pointer if the context is not an entire resource
+                    and the representation's media type does not allow constructing an
+                    appropriate fragment.  This requirement includes determining the
+                    correct base URI when the context is provided as a relative reference.
+                </t>
+                <t hangText="Target identification">
+                    For a given link, an implementation MUST be able to construct the
+                    target IRI or URI based on the instance and, if "hrefSchema" is present,
+                    client input.  When working with client input, the input data MUST be
+                    pre-populated from the instance when a template variable matches instance
+                    data and is present in "hrefSchema".  This requirement includes
+                    determining the correct base URI when the target is provided as
+                    a relative reference.
+                </t>
+                <t hangText="Target attribute usage">
+                    For a given link, an implementation MUST make the values of all
+                    target attribute keywords directly available to the client.
+                    Implementations MAY provide additional interfaces for using this
+                    information, which is discussed in each keyword's section.
+                </t>
+                <t hangText="Accepting client input">
+                    For a given link, an implementation MUST make the value of each
+                    input schema keywords directly available to the client.
+                </t>
+            </list>
+            Implementations MAY provide additional functionality coordinating the use of
+            JSON Hyper-Schema with other specifications, including but not limited to
+            JSON Schema validation, serializing payloads based on media types, and
+            communicating with resource via protocols as indicated by URI schemes.
+        </t>
+<!--
+        <section title="Link applicability">
         </section>
-        <section title="Overview">
-            <t>
-                This document describes how JSON Schema can be used to define hyperlinks on instance
-                data.
-            </t>
-            <t>
-                As with all JSON Schema keywords, all the keywords described in the "Schema
-                Keywords" section are optional. The minimal valid JSON Hyper-schema is the blank
-                object.
-            </t>
-            <figure>
-                <preamble>
-                    Here is an example JSON Schema defining hyperlinks:
-                </preamble>
-                <artwork>
-<![CDATA[
-{
-    "title": "Written Article",
-    "type": "object",
-    "properties": {
-        "id": {
-            "title": "Article Identifier",
-            "type": "number",
-            "readOnly": true
-        },
-        "title": {
-            "title": "Article Title",
-            "type": "string"
-        },
-        "authorId": {
-            "type": "integer"
-        }
-    },
-    "required" : ["id", "title", "authorId"],
-    "links": [
-        {
-            "rel": "self",
-            "href": "/article{?id}"
-        },
-        {
-            "rel": "author",
-            "href": "/user?id={authorId}"
-        }
-    ]
-}
-]]>
-                </artwork>
-                <postamble>
-                    This example schema defines the properties of the instance as well as link
-                    relations for the instance, with URIs incorporating values from the instance.
-                </postamble>
-            </figure>
+        <section title="Link context identification">
+        </section>
+        <section title="Link target identification">
+        </section>
+        <section title="Accepting input for use with a link">
+        </section>
+        <section title="Making use of link target attributes">
+        </section>
+  -->
 
+        <section title="Schema keywords">
             <section title="Interaction with validation">
                 <t>
                     Hyper-schema keywords can be applied when the instance is valid against
@@ -383,16 +382,6 @@
                     against all array elements.
                 </t>
             </section>
-        </section>
-
-        <section title="Meta-schema">
-            <t>
-                The current URI for the JSON Hyper-Schema meta-schema is
-                &lt;http://json-schema.org/draft-06/hyper-schema#&gt;.
-            </t>
-        </section>
-
-        <section title="Schema keywords">
             <section title="base">
                 <t>
                     If present, this keyword is resolved against the current URI base that the
