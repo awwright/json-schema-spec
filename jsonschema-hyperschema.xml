@@ -442,7 +442,7 @@
                     dependent, and users are encouraged to utilize the most
                     suitable existing accepted relation definitions.
                 </t>
-                <section title="rel">
+                <section title="rel" anchor="rel">
                     <t>
                         The value of this property MUST be a string, and MUST be a single
                         Link Relation Type as defined in RFC 5988bis, Section 2.1.
@@ -796,125 +796,6 @@
                     <t>
                         Omitting "submissionSchema" or setting the entire schema to "false" prevents
                         any user agent data from being accepted.
-                    </t>
-                </section>
-            </section>
-
-            <section title="rel" anchor="rel">
-                <t>
-                    The value of the "rel" property indicates the name of the relation to the target
-                    resource. The value MUST be a registered link relation from the
-                    <xref target="RFC5988">IANA Link Relation Type Registry established in RFC 5988</xref>,
-                    or a normalized URI following the <xref target="RFC3986">URI production of RFC 3986</xref>.
-                    This property is required.
-                </t>
-
-                <t>
-                    As defined by RFC 5988, a link connects a context resource
-                    to a target resource, where the nature of the connection
-                    is described by the link relation type.  The context
-                    resource is the instance to which the schema (or sub-schema)
-                    applies, rather than any larger document in which the
-                    instance may have been found.  The context may be changed
-                    with the <xref target="anchor">"anchor"</xref> or
-                    <xref target="anchorPointer">"anchorPointer"</xref> properties.
-                </t>
-
-                <t>
-                    Depending on the media type of the instance, it may or may
-                    not be possible to assign a URI to the exact default context
-                    resource.  In particular, application/json does not define
-                    URI fragment resolution semantics, so properties or array
-                    elements within a plain JSON document cannot be identified
-                    by a URI.
-                </t>
-
-                <t>
-                    Relationship definitions are not normally media type
-                    dependent, and users are encouraged to utilize the most
-                    suitable existing accepted relation definitions.
-                </t>
-
-                <t>
-                    When no registered relation (aside from "related") applies, users are
-                    encouraged to mint their own extension relation types, as described in
-                    <xref target="RFC5988">section 4.2 of RFC 5988</xref>.  The simplest
-                    approaches for choosing link relation type URIs are to either use
-                    a URI scheme that is already in use to identify the system's primary
-                    resources, or to use a human-readable, non-dereferenceable URI scheme
-                    such as <xref target="RFC4151">"tag", defined by RFC 4151</xref>.
-                    Extension relation type URIs need not be dereferenceable, even when
-                    using a scheme that allows it.
-                </t>
-                <figure>
-                    <preamble>
-                        As an example of registered relation types, if a hyper-schema is defined:
-                    </preamble>
-                    <artwork>
-<![CDATA[{
-    "type": "array",
-    "items": {
-        "links": [{
-            "rel": "item",
-            "href": "{id}"
-        }, {
-            "rel": "up",
-            "href": "{upId}"
-        }]
-    }
-}]]>
-                    </artwork>
-                </figure>
-
-                <figure>
-                    <preamble>
-                        And if a collection of instance resources were retrieved with JSON
-                        representation:
-                    </preamble>
-                    <artwork>
-<![CDATA[GET /Resource/
-
-[{
-    "id": "thing",
-    "upId": "parent"
-}, {
-    "id": "thing2",
-    "upId": "parent"
-}]]]>
-                    </artwork>
-                    <postamble>
-                        This would indicate that for the first item in the collection, its URI as
-                        its own resource would resolve to "/Resource/thing" and the first item's
-                        "up" relation SHOULD be resolved to the resource at "/Resource/parent".
-                    </postamble>
-                </figure>
-
-                <t>
-                    Note that these relationship values are case-insensitive, consistent with their
-                    use in HTML and the <xref target="RFC5988">HTTP Link header</xref>.
-                </t>
-                <section title="&quot;collection&quot; and &quot;item&quot; links">
-                    <t>
-                        <xref target="RFC6573">RFC 6573</xref> defines and registers
-                        the "item" and "collection" link relations.  A well-known design pattern
-                        in hypermedia is to use a collection resource to create a member of the
-                        collection and give it a server-assigned URI.  When using HTTP, or a protocol
-                        such as CoAP that is explicitly analogous to HTTP, this is done by POST-ing
-                        a representation of the individual resource to be created to the collection
-                        resource.
-                    </t>
-                    <t>
-                        Resources that are the target of a "collection" link using HTTP or an analogous
-                        protocol in JSON Hyper-Schema MUST NOT assign semantics other than resource
-                        creation to POST (or the analogous method in non-HTTP protocols).
-                    </t>
-                    <t>
-                        The <xref target="submissionSchema">"submissionSchema"</xref> field for the
-                        link SHOULD be identical to the schema of the representations of the
-                        collection's items, as indicated by the "item" link.  RFC 6573 identifies
-                        the "collection" and "item" link relation types as reciprocal, so the
-                        context resource of an "item" link MAY be treated as a collection, even if
-                        no explicit "collection" link is defined.
                     </t>
                 </section>
             </section>
