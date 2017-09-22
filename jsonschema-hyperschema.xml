@@ -204,9 +204,8 @@
                 sections and keyword group overviews.
             </t>
             <section title="Link discovery">
-                <t>
-                <list style="hanging">
-                    <t hangText="By attachement location">
+                <section title="By attachement location">
+                    <t>
                         An implementation MUST find and make accessible all links in
                         all (sub)schemas against which this (sub)instance is valid.
                         These links MUST all be presented as a single set, regardless
@@ -214,7 +213,9 @@
                         their "hrefRequired" keyword based on the instance and/or potential
                         client input MUST be excluded.
                     </t>
-                    <t hangText="By context">
+                </section>
+                <section title="By context">
+                    <t>
                         In addition to providing the set of links attached to a location
                         in the instance, an implementation that considers the entire instance
                         and schema at once MUST provide sets of links for which a given
@@ -226,56 +227,59 @@
                         of an ordered array.  Implementations MUST preserve the order of
                         such links with respect to each other.
                     </t>
-                </list>
-                </t>
+                </section>
             </section>
             <section title="Link usage">
-                <t>
-                    <list style="hanging">
-                        <t hangText="Context identification">
-                            For a given link, an implementation MUST be able to identify the
-                            link's context.  The identifier MUST either be an IRI or URI
-                            that fully identifies the context, or an IRI or URI together
-                            with a JSON Pointer if the context is not an entire resource
-                            and the representation's media type does not allow constructing an
-                            appropriate fragment.  This requirement includes determining the
-                            correct base URI when the context is provided as a relative reference.
-                        </t>
-                        <t hangText="Link relation types">
-                            Implementations MUST recognize a link with a "self" relation typd as
-                            describing the possible interactions with the resource represented by
-                            the instance data.  Collections MUST be recognized based on traversing
-                            a "collection" link, and MAY be recognized based on the presence of
-                            an "item" link which has as its context the instance or a sub-instance.
-                        </t>
-                        <t hangText="Target identification">
-                            For a given link, an implementation MUST be able to construct the
-                            target IRI or URI based on the instance and, if "hrefSchema" is present,
-                            client input.  When working with client input, the input data MUST be
-                            pre-populated from the instance when a template variable matches instance
-                            data and is present in "hrefSchema".  This requirement includes
-                            determining the correct base URI when the target is provided as
-                            a relative reference.
-                        </t>
-                        <t hangText="Target attribute usage">
-                            For a given link, an implementation MUST make the values of all
-                            target attribute keywords directly available to the client.
-                            Implementations MAY provide additional interfaces for using this
-                            information, which is discussed in each keyword's section.
-                        </t>
-                        <t hangText="Accepting client input">
-                            For a given link, an implementation MUST make the value of each
-                            input schema keywords directly available to the client.
-                        </t>
-                        <t hangText="Encapsulation">
-                            In order to encourage treating context and target URIs as opaque
-                            identifiers, implementations MAY opt to hide those fields that
-                            are only used in URI construction: "href", "hrefPointers", "hrefRequired",
-                            "anchor", and "anchorPointer".  Implementations MAY offer a configuration
-                            option to enable or disable encapsulation.
-                        </t>
-                    </list>
-                </t>
+                <section title="Target and context identification">
+                    <t>
+                        For a given link, an implementation MUST be able to identify the
+                        link's context.  The identifier MUST either be an IRI or URI
+                        that fully identifies the context, or an IRI or URI together
+                        with a JSON Pointer if the context is not an entire resource
+                        and the representation's media type does not allow constructing an
+                        appropriate fragment.  This requirement includes determining the
+                        correct base URI when the context is provided as a relative reference.
+                    </t>
+                    <t>
+                        For a given link, an implementation MUST be able to construct the
+                        target IRI or URI based on the instance and, if "hrefSchema" is present,
+                        client input.  When working with client input, the input data MUST be
+                        pre-populated from the instance when a template variable matches instance
+                        data and is present in "hrefSchema".  This requirement includes
+                        determining the correct base URI when the target is provided as
+                        a relative reference.
+                    </t>
+                    <t>
+                        In order to encourage treating context and target URIs as opaque
+                        identifiers, implementations MAY opt to hide those fields that
+                        are only used in URI construction: "href", "hrefPointers", "hrefRequired",
+                        "anchor", and "anchorPointer".  Implementations MAY offer a configuration
+                        option to enable or disable encapsulation.
+                    </t>
+                </section>
+                <section title="Recognizing standard link relation types">
+                    <t>
+                        Implementations MUST recognize a link with a "self" relation typd as
+                        describing the possible interactions with the resource represented by
+                        the instance data.  Collections MUST be recognized based on traversing
+                        a "collection" link, and MAY be recognized based on the presence of
+                        an "item" link which has as its context the instance or a sub-instance.
+                    </t>
+                </section>
+                <section title="Providing access to target attributes and input schemas">
+                    <t>
+                        For a given link, an implementation MUST make the values of all
+                        target attribute keywords directly available to the client.
+                        Implementations MAY provide additional interfaces for using this
+                        information, which is discussed in each keyword's section.
+                    </t>
+                    <t>
+                        For a given link, an implementation MUST make the value of each
+                        input schema keywords directly available to the client.
+                    </t>
+                </section>
+            </section>
+            <section title="Additional functionality">
                 <t>
                     Implementations MAY provide additional functionality coordinating the use of
                     JSON Hyper-Schema with other specifications, including but not limited to
@@ -435,9 +439,8 @@
             </section>
             <section title="Link relation type" anchor="relationType">
                 <t>
-                    The link's relation type identifies its semantics.  Implementations
-                    MUST support looking up links relevant to a particular context
-                    by their link relation.
+                    The link's relation type identifies its semantics.  It is the primary
+                    means of conveying how an application can interact with a resource.
                 </t>
                 <t>
                     Relationship definitions are not normally media type
@@ -460,7 +463,7 @@
                         represented by the instance.  A "self" link MUST be resolvable
                         from the instance, and therefore "hrefSchema" MUST NOT be present
                         Hyper-schema authors SHOULD use "hrefRequired" to ensure that the
-                        link has all instance data that is needed for use.
+                        "self" link has all instance data that is needed for use.
                     </t>
                 </section>
                 <section title='"collection" and "item" links' anchor="collectionAndItem">
@@ -509,6 +512,10 @@
             </section>
             <section title="Link target">
                 <t>
+                    A hyper-schema implementation MUST keep track of the current URI with
+                    which it is working.  Traversing a link changes the current URI from
+                    that which was used to retrieve the current instance to that which
+                    can be used to retrieve the link's target.
                 </t>
                 <section title="href" anchor="href">
                     <t>
@@ -539,7 +546,6 @@
                         "href" template variable names MUST be ignored.
                     </t>
                 </section>
-
                 <section title="hrefRequired" anchor="hrefRequired">
                     <t>
                         The value of this keyword MUST be an array, and the elements MUST be unique.
@@ -549,16 +555,8 @@
                         a value, the link MUST NOT be used.
                     </t>
                 </section>
+
                 <section title="URI Templating">
-                    <t>
-                        <cref>
-                            The pre-processing rules present in earlier drafts have been removed due
-                            to their complexity and inability to address all limitations with URI
-                            templating.
-                            This section is subject to significant change in upcoming drafts to
-                            replace the old pre-processing with a comprehensive solution.
-                        </cref>
-                    </t>
                     <t>
                         The value of "href" is to be used as a URI Template, as defined in
                         <xref target="RFC6570">RFC 6570</xref>.
@@ -1165,7 +1163,7 @@
                 the headerSchema of a link, defining an API-wide approach to any
                 cross-cutting concerns is beyond the scope of hyper-schema.
             </t>
-            <section title="Implementation separation of concerns">
+            <section title="Separation of concerns">
                 <t>
                     Working with a JSON Hyper-Schema-based API will generally involve
                     three components:  The hyper-schema implementation, a generic user agent,
