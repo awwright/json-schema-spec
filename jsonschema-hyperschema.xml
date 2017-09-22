@@ -129,24 +129,11 @@
 
         <section title="Overview">
             <t>
-                This document describes how JSON Schema can be used to define hyperlinks on instance
-                data.
-            </t>
-        </section>
-
-        <section title="Purpose">
-            <t>
-                Hypermedia systems, which follow the constraints of the REST architectural
-                style, enable the creation of generic user agents.  Such a user agent
-                has no application-specific knowledge.  Rather, it understands pre-defined
-                media types, URI schemes, protocols, and link relations, often by recognizing
-                these and coordinating the use of existing software that implement support
-                for them.  Applications can then be built on top of such a user agent, focusing
-                on their own semantics and logic rather than the mechanics of the interactions.
-            </t>
-            <t>
                 JSON Hyper-Schema makes it possible to build hypermedia systems from JSON
-                documents.  The combination of a JSON instance document and a valid
+                documents by describing how to construct hyperlinks from instance data.
+            </t>
+            <t>
+                The combination of a JSON instance document and a valid
                 application/schema+json hyper-schema for that instance behaves
                 as a single hypermedia representation.  By allowing this separation,
                 hyper-schema-based systems can gracefully support clients that expect
@@ -1237,6 +1224,15 @@
         </section>
         <section title="Using JSON Hyper-Schema in APIs" anchor="apis">
             <t>
+                Hypermedia APIs, which follow the constraints of the REST architectural
+                style, enable the creation of generic user agents.  Such a user agent
+                has no application-specific knowledge.  Rather, it understands pre-defined
+                media types, URI schemes, protocols, and link relations, often by recognizing
+                these and coordinating the use of existing software that implement support
+                for them.  Applications can then be built on top of such a user agent, focusing
+                on their own semantics and logic rather than the mechanics of the interactions.
+            </t>
+            <t>
                 JSON Hyper-Schema is ideal for representing individual resources in hypermedia
                 APIs.  It offers comprehensive capabilities for describing how to use hyperlinks
                 to interact with the current resource (through "self" links), or related
@@ -1264,18 +1260,25 @@
                     three components:  The hyper-schema implementation, a generic user agent,
                     and a client application.  The hyper-schema implementation's requirements
                     are given in this specification.  The generic user agent handles standardized
-                    URI schemes, protocols, and media types.  The client application has the
-                    domain-specific knowledge of link relation types and data structure fields
-                    needed to make use of the specific API.
+                    URI schemes, protocols, and media types.  User agents that handle HTTP,
+                    HTTPS, and JSON, for instance, are available as libraries in many programming
+                    languages.
                 </t>
                 <t>
+                    The client application has the domain-specific knowledge of link relation
+                    types and data structure fields needed to make use of the specific API.
                     A client application can use an available user agent library and a hyper-schema
-                    implementation separately.  Extensible user agents can allow adding hyper-schema
-                    support as a plug-in alongside support for plain JSON, XML, or other media
-                    types.
+                    implementation separately.  Alternatively, extensible user agents can allow
+                    adding hyper-schema support as a plug-in alongside support for plain JSON, XML,
+                    or other media types.
+                </t>
+                <t>
+                    <cref>
+                        Add something about generic user agents not being magic, HATEOAS, etc.
+                    </cref>
                 </t>
             </section>
-            <section title="Representation versinioning">
+            <section title="Representation versioning">
             </section>
             <section title="API entry point">
                 <t>
