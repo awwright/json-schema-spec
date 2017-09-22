@@ -360,10 +360,6 @@
                 for use with the links in various ways.
             </t>
             <t>
-                Each keyword is covered briefly in this section, with additional usage explanation
-                and comprehensive examples given later in the document.
-            </t>
-            <t>
                 Note that due to the use of URI Templates to identify link targets, as well as
                 further use of client input, an LDO is a link template that may resolve to multiple
                 links when used with a JSON instance document.
@@ -372,6 +368,10 @@
                 A Link Description Object MUST be an object, and the
                 <xref target="href">"href"</xref> and <xref target="rel">"rel"</xref> properties
                 MUST be present.
+            </t>
+            <t>
+                Each keyword is covered briefly in this section, with additional usage explanation
+                and comprehensive examples given later in the document.
             </t>
             <t>
                 The link description format can be used without JSON Schema, and use of this format
@@ -385,7 +385,7 @@
             <section title="Link context" anchor="context">
                 <t>
                     In JSON Hyper-Schema, the link's context resource is, by default, the specific
-                    part of the instance that validates against the schema containing the LDO.
+                    location in the instance that validates against the schema containing the LDO.
                     This is often not the entire instance document.  This default context can
                     be changed using the keywords in this section.
                 </t>
@@ -394,7 +394,9 @@
                     to assign a URI to the exact default context resource.  In particular,
                     application/json does not define URI fragment resolution semantics, so
                     properties or array elements within a plain JSON document cannot be identified
-                    by a URI.
+                    by a URI.  When it is not possible to produce a complete URI, the position
+                    of the context SHOULD be conveyed by a the URI of the instance document,
+                    together with a separate plain-string JSON Pointer.
                 </t>
                 <t>
                     Implementations MUST be able to construct the link context's URI, and
@@ -453,14 +455,27 @@
                 </section>
                 <section title='"self" links' anchor="self">
                     <t>
-                        SHOULD be fulfillable from the instance.
-                        SHOULD NOT allow input with "hrefSchema".
+                        A hyper-schema implementation MUST recognize that a link with relation
+                        type "self" describes how a user agent can interact with the resource
+                        represented by the instance.  A "self" link MUST be resolvable
+                        from the instance, and therefore "hrefSchema" MUST NOT be present
+                        Hyper-schema authors SHOULD use "hrefRequired" to ensure that the
+                        link has all instance data that is needed for use.
                     </t>
                 </section>
                 <section title='"collection" and "item" links' anchor="collectionAndItem">
                     <t>
                         <xref target="RFC6573">RFC 6573</xref> defines and registers
-                        the "item" and "collection" link relations.  A well-known design pattern
+                        the "item" and "collection" link relation types.  JSON Hyper-Schema imposes
+                        additional semantics on collection resources indicated by these types.
+                    </t>
+                    <t>
+                        Implementations MUST recognize the target of a "collection" link as
+                        a collection, and SHOULD recognize that the context resource of an
+                        "item" link is a collection.
+                    </t>
+                    <t>
+                        A well-known design pattern
                         in hypermedia is to use a collection resource to create a member of the
                         collection and give it a server-assigned URI.  When using HTTP, or a protocol
                         such as CoAP that is explicitly analogous to HTTP, this is done by POST-ing
@@ -471,14 +486,9 @@
                         Resources that are the target of a "collection" link using HTTP or an analogous
                         protocol in JSON Hyper-Schema MUST NOT assign semantics other than resource
                         creation to POST (or the analogous method in non-HTTP protocols).
-                    </t>
-                    <t>
                         The <xref target="submissionSchema">"submissionSchema"</xref> field for the
                         link SHOULD be identical to the schema of the representations of the
-                        collection's items, as indicated by the "item" link.  RFC 6573 identifies
-                        the "collection" and "item" link relation types as reciprocal, so the
-                        context resource of an "item" link MAY be treated as a collection, even if
-                        no explicit "collection" link is defined.
+                        collection's items, as indicated by the "item" link.
                     </t>
                 </section>
                 <section title="Using extension relation types" anchor="extensionRelationTypes">
