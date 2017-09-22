@@ -133,20 +133,20 @@
                 documents by describing how to construct hyperlinks from instance data.
             </t>
             <t>
-                The combination of a JSON instance document and a valid
-                application/schema+json hyper-schema for that instance behaves
-                as a single hypermedia representation.  By allowing this separation,
-                hyper-schema-based systems can gracefully support clients that expect
-                plain JSON, while providing full hypermedia capabilities for hyper-schema-aware
-                user agents.
+                The combination of a JSON instance document and a valid application/schema+json
+                hyper-schema for that instance behaves as a single hypermedia representation.
+                By allowing this separation, hyper-schema-based systems can gracefully support
+                applications that expect plain JSON, while providing full hypermedia capabilities
+                for hyper-schema-aware applications and user agents.
             </t>
             <t>
                 Client-side user agents can detect the presence of hyper-schema by looking for
                 the application/schema+json media type and a "$schema" value that indicates the
                 presence of the hyper-schema vocabulary.  A user agent can then use an
                 implementation of JSON Hyper-Schema to provide an interface to the
-                schema and instance documents as a representation of a single resource, just
-                as with any single-document hypermedia representation.
+                combination of the schema and instance documents as a single logical
+                representation of a resource, just as with any single-document hypermedia
+                representation format.
             </t>
             <t>
                 Hyper-schemas allow representations to take up fewer bytes on the wire, and
@@ -172,14 +172,16 @@
                 &lt;http://json-schema.org/draft-06/hyper-schema#&gt;.
             </t>
         </section>
+
         <section title="General implementation requirements">
             <t>
                 A JSON Hyper-Schema implementation is able to take a hyper-schema, an
                 instance, and optionally an identification of a location within the instance
                 (such as a JSON Pointer or a URI fragment appropriate for the media type),
-                and produce information about any links that apply to that location.
-                This information is returned in the form of URIs and/or JSON Pointers.
-                Additionally, some fields are intended for direct use by client applications.
+                and produce information about any links that apply to that instance
+                or location.  This information is returned in the form of URIs and/or JSON Pointers.
+                Additionally, some fields are intended for direct use by user agents and
+                client applications.
             </t>
             <t>
                 At a high level, a conforming implementation will meet the following requirements.
@@ -199,11 +201,11 @@
                 </section>
                 <section title="By context">
                     <t>
-                        In addition to providing the set of links attached to a location
-                        in the instance, an implementation that considers the entire instance
-                        and schema at once MUST provide sets of links for which a given
-                        location is the link's context.  All such links MUST be in at least
-                        one set of links produced by examining attachment locations.
+                        In addition to providing the set of links attached to a location in the
+                        instance, an implementation that considers the entire instance and schema
+                        at once MUST make accessible the set of links for which a given location
+                        is the link's context.  All such links MUST be in at least one set of links
+                        produced by examining all attachment locations in the instance.
                     </t>
                     <t>
                         Streaming implementations MAY opt to only provide links that have
@@ -364,13 +366,15 @@
                 links when used with a JSON instance document.
             </t>
             <t>
-                A Link Description Object MUST be an object, and the
-                <xref target="href">"href"</xref> and <xref target="rel">"rel"</xref> properties
-                MUST be present.
+                A specific use of an LDO, typically involving a request and response across
+                a protocol, is referred to as an operation.  For many protocols, multiple
+                operations are possible on any given link.
             </t>
             <t>
-                Each keyword is covered briefly in this section, with additional usage explanation
-                and comprehensive examples given later in the document.
+                A Link Description Object MUST be an object, and the
+                <xref target="href">"href"</xref> and <xref target="rel">"rel"</xref> properties
+                MUST be present.  Each keyword is covered briefly in this section, with additional
+                usage explanation and comprehensive examples given later in the document.
             </t>
             <t>
                 The link description format can be used without JSON Schema, and use of this format
@@ -906,18 +910,19 @@
                         In JSON Hyper-Schema, <xref target="targetSchema">"targetSchema"</xref>
                         supplies a non-authoritative description of the target resource's
                         representation. A client can use "targetSchema" to structure input for
-                        replacing or modifying the representation.  Alternatively, if "targetSchema"
-                        is absent or if the client prefers to only use authoritative information, it
-                        can interact with the target resource to confirm or discover its
-                        representation structure.
+                        replacing or modifying the representation, or as the base representation
+                        for buildign a patch document based on a patch media type.
+                    </t>
+                    <t>
+                        Alternatively, if "targetSchema" is absent or if the client prefers to
+                        only use authoritative information, it can interact with the target
+                        resource to confirm or discover its representation structure.
                     </t>
                     <t>
                         "targetSchema" is not intended to describe link operation responses,
                         except when the response semantics indicate that it is a representation
                         of the target resource.  In all cases, the schema indicated by the response
-                        itself is authoritative.  See the
-                        <xref target="targetHTTP" /> for guidance
-                        specific to each HTTP method when using "targetSchema" with HTTP URIs.
+                        itself is authoritative.
                     </t>
                 </section>
                 <section title="Submitting data for processing">
@@ -936,35 +941,43 @@
                             <xref target="submissionSchema">"submissionSchema"</xref>.
                         </t>
                         <t>
-                            Omitting this keyword has the same behavior as a value of application/json.
+                            Omitting this keyword has the same behavior as a value of
+                            application/json.
                         </t>
                         <t>
                             Note that "submissionMediaType" and "submissionSchema"
                             are not restricted to HTTP URIs.
+                            <cref>This statement might move to wherever the example ends up.</cref>
                         </t>
                     </section>
 
                     <section title="submissionSchema" anchor="submissionSchema">
                         <t>
                             This property contains a schema which defines the acceptable structure
-                            of the document to be encoded according to the "submissionMediaType" property
-                            and sent to the target resource for processing.  This can be viewed as
-                            describing the domain of the processing function implemented by the
-                            target resource.
+                            of the document to be encoded according to the "submissionMediaType"
+                            property and sent to the target resource for processing.  This can be
+                            viewed as describing the domain of the processing function implemented
+                            by the target resource.
                         </t>
-
                         <t>
                             This is a separate concept from the
-                            <xref target="targetSchema">"targetSchema"</xref> property, which is describing
-                            the target information resource (including for replacing the contents of the
-                            resource in a PUT request), unlike "submissionSchema" which describes the
-                            user-submitted request data to be evaluated by the resource. "submissionSchema"
-                            is intended for use with requests that have payloads that are not defined in
-                            terms of the target representation.
+                            <xref target="targetSchema">"targetSchema"</xref> property, which
+                            describes the target information resource (including for replacing the
+                            contents of the resource in a PUT request), unlike "submissionSchema"
+                            which describes the user-submitted request data to be evaluated by the
+                            resource. "submissionSchema" is intended for use with requests that
+                            have payloads that are not necessarily defined in terms of the target
+                            representation.
                         </t>
                         <t>
-                            Omitting "submissionSchema" or setting the entire schema to "false" prevents
-                            any user agent data from being accepted.
+                            Omitting "submissionSchema" or setting the entire schema to "false"
+                            prevents any user agent data from being accepted.
+                            <cref>
+                                Is this correct?  In draft-06 this was the only way to signal
+                                support for data submission, but now we have "targetHints" for
+                                that.  It may make more sense for this to default to behaving
+                                as if the schema is set to true.
+                            </cref>
                         </t>
                     </section>
                 </section>
@@ -1159,7 +1172,7 @@
                     </cref>
                 </t>
             </section>
-            <section title='"targetHints" and HTTP'>
+            <section title='Optimizing HTTP discoverability with "targetHints"'>
                 <t>
                     <cref>It would be good to also include a section with CoAP examples.</cref>
                 </t>
@@ -1188,7 +1201,7 @@
                     times SHOULD NOT be included in "targetHints".
                 </t>
             </section>
-            <section title='"headerSchema" and HTTP'>
+            <section title='Advertising HTTP features with "headerSchema"'>
                 <t>
                     Schemas SHOULD be written to describe JSON serializations that
                     follow guidelines established by the work in progress
@@ -1278,9 +1291,36 @@
                     </cref>
                 </t>
             </section>
-            <section title="Representation versioning">
+            <section title="Resource evolution with Hyper-Schema">
+                <t>
+                    Since a given JSON Hyper-Schema is used with a single resource at a single
+                    point in time, it has no inherent notion of versioning.  However, a given
+                    resource can change which schema or schemas it uses over time, and the
+                    URIs of these schemas can be used to indicate versioning information.
+                    When used with a media type that supports indicating a schema with a media
+                    type parameter, these versioned schema URIs can be used in content negotiation.
+                </t>
+                <t>
+                    A resource can indicate that it is an instance of multiple schemas, which allows
+                    supporting multiple compatible versions simultaneously.  A client application
+                    can then make use of the hyper-schema that it recognizes, and ignore newer
+                    or older versions.
+                </t>
+                <t>
+                    Note that this notion of changing the representaiton version using
+                    successive hyper-schemas is separate from deprecating an entire resource
+                    and either removing it or replacing it with a new resource at a new URI.
+                    The "targetHints" keyword can be used to convey deprecation information.
+                </t>
+                <t>
+                    <cref>
+                        This section is something of a placeholder, with the goal being to 
+                        get readers to understand that while hyper-schema helps with versioning,
+                        it does not and will not have explicit features to support it.
+                    </cref>
+                </t>
             </section>
-            <section title="API entry point">
+            <section title="Entry point resource">
                 <t>
                     To create an entry point for an API, it is RECOMMENDED to provide
                     a resource at a documented entry point URI with the minimal amount of data
@@ -1298,6 +1338,11 @@
                     its own (possibly anonymous) resource, and should identify its own
                     hyper-schema to allow the user agent or client application to interpret any
                     information that is provided beyond the protocol's own status reporting.
+                </t>
+                <t>
+                    Protocol and media type specifications provide the necessary information to
+                    deal with different responses at runtime, while documenting all responses
+                    is a concern static analysis across all hyper-schemas making up an API.
                 </t>
             </section>
         </section>
