@@ -1103,6 +1103,18 @@
             &ldp;
         </references>
         <section title="JSON Hyper-Schema and HTTP">
+            <t>
+                While JSON Hyper-Schema is a hypermedia format and therefore protocol-independent,
+                its most common expected use is in HTTP systems, or systems using protocols
+                such as CoAP which are explicitly analogous to HTTP.
+            </t>
+            <t>
+                This appendix provides guidance on how to define links for use with each
+                common HTTP method, and how collection resources impose additional constarints
+                on the use of HTTP POST.  Additionaly, guidance is provided on hinting at
+                HTTP response header values and describing possible HTTP request headers
+                that are relevant to the given resource.
+            </t>
             <section title="One link per target and relation type">
                 <t>
                     Link Description Objects do not directly indicate what operations, such
@@ -1184,6 +1196,10 @@
                         <t>Authentication challenges</t>
                     </list>
                 </t>
+                <t>
+                    In general, headers that are likely to have different values at different
+                    times SHOULD NOT be included in "targetHints".
+                </t>
             </section>
             <section title='"headerSchema" and HTTP'>
                 <t>
@@ -1199,11 +1215,16 @@
                     <list style="symbols">
                         <t>Content negotiation</t>
                         <t>Authentication and authorization</t>
-                        <t>Conditional requests</t>
                         <t>Range requests</t>
-                        <t>Cache control</t>
                         <t>The "Prefer" header</t>
                     </list>
+                </t>
+                <t>
+                    Headers such as cache control and conditional request headers are generally
+                    implemented by intermediaries rather than the resource, and are therefore
+                    not generally useful to describe.  While the resource must supply the
+                    information needed to use conditional requests, the runtime handling of
+                    such headers and related responses is not resource-specific.
                 </t>
             </section>
             <section title="Creating resources through collections">
