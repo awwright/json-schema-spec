@@ -169,7 +169,8 @@
         <section title="Meta-schema">
             <t>
                 The current URI for the JSON Hyper-Schema meta-schema is
-                &lt;http://json-schema.org/draft-06/hyper-schema#&gt;.
+                <eref target="http://json-schema.org/draft-06/hyper-schema#">
+                http://json-schema.org/draft-06/hyper-schema#</eref> (draft-06 version).
             </t>
         </section>
 
@@ -189,7 +190,7 @@
                 sections and keyword group overviews.
             </t>
             <section title="Link discovery">
-                <section title="By attachement location">
+                <section title="By attachment location">
                     <t>
                         An implementation MUST find and make accessible all links in
                         all (sub)schemas against which this (sub)instance is valid.
@@ -199,7 +200,7 @@
                         client input MUST be excluded.
                     </t>
                 </section>
-                <section title="By context">
+                <section title="By link context location">
                     <t>
                         In addition to providing the set of links attached to a location in the
                         instance, an implementation that considers the entire instance and schema
@@ -361,9 +362,9 @@
                 for use with the links in various ways.
             </t>
             <t>
-                Note that due to the use of URI Templates to identify link targets, as well as
-                further use of client input, an LDO is a link template that may resolve to multiple
-                links when used with a JSON instance document.
+                Due to the use of URI Templates to identify link targets, as well as further use
+                of client input, an LDO is a link template that may resolve to multiple links when
+                used with a JSON instance document.
             </t>
             <t>
                 A specific use of an LDO, typically involving a request and response across
@@ -381,8 +382,8 @@
                 can be declared by referencing the normative link description schema as the schema
                 for the data structure that uses the links.
                 The URI of the normative link description schema is:
-                <eref target="http://json-schema.org/draft-06/links">http://json-schema.org/draft-06/links</eref>
-                (draft-06 version).
+                <eref target="http://json-schema.org/draft-06/links#">
+                http://json-schema.org/draft-06/links#</eref> (draft-06 version).
             </t>
 
             <section title="Link context" anchor="context">
