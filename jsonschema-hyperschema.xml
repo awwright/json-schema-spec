@@ -16,6 +16,7 @@
 <!ENTITY I-D.luff-relative-json-pointer SYSTEM "https://xml2rfc.tools.ietf.org/public/rfc/bibxml3/reference.I-D.draft-luff-relative-json-pointer-00.xml">
 <!ENTITY I-D.kelly-json-hal SYSTEM "https://xml2rfc.tools.ietf.org/public/rfc/bibxml3/reference.I-D.draft-kelly-json-hal-08.xml">
 <!ENTITY I-D.reschke-http-jfv SYSTEM "https://xml2rfc.tools.ietf.org/public/rfc/bibxml3/reference.I-D.draft-reschke-http-jfv-06.xml">
+<!ENTITY ldp SYSTEM "https://xml2rfc.tools.ietf.org/public/rfc/bibxml4/reference.W3C.REC-ldp-20150226.xml">
 ]>
 <?rfc toc="yes"?>
 <?rfc symrefs="yes"?>
@@ -1099,25 +1100,31 @@
             &rfc7231;
             &I-D.nottingham-rfc5988bis;
             &I-D.kelly-json-hal;
+            &ldp;
         </references>
         <section title="JSON Hyper-Schema and HTTP">
-            <t>
-                Link Description Objects do not directly indicate what operations, such
-                as HTTP methods, are supported by the target resource.  Instead, operations
-                should be inferred primarily from link <xref target="rel">relation types</xref>
-                and URI schemes.  Note, however, that a resource may always decline an operation
-                at runtime, for instance due to application state that controls the operation's
-                availability.
-            </t>
-            <section title="Use a single link per target URI and relation type">
-            </section>
-            <section title='"headerSchema" and HTTP'>
+            <section title="One link per target and relation type">
                 <t>
-                    Schemas SHOULD be written to describe JSON serializations that
-                    follow guidelines established by the work in progress
-                    <xref target="I-D.reschke-http-jfv">"A JSON Encoding for HTTP Header Field Values"</xref>
-                    Approaches shown in that document's examples SHOULD be applied to
-                    other similarly structured headers wherever possible.
+                    Link Description Objects do not directly indicate what operations, such
+                    as HTTP methods, are supported by the target resource.  Instead, operations
+                    should be inferred primarily from link <xref target="rel">relation types</xref>
+                    and URI schemes.
+                </t>
+                <t>
+                    This means that for each target resource and link relation type pair, schema
+                    authors SHOULD only define a single LDO.  While it is possible to use
+                    "allow" with "targetHints" to repeat a relation type and target pair with
+                    different HTTP methods marked as allowed, this is NOT RECOMMENDED and may
+                    not be well-supported by conforming implementations.
+                </t>
+                <t>
+                    All information necessary to use each HTTP method can be conveyed in a
+                    single LDO as explained in this appendix.
+                </t>
+                <t>
+                    Note, however, that a resource may always decline an operation at runtime,
+                    for instance due to authorization failure, or due to other application state
+                    that controls the operation's availability.
                 </t>
             </section>
             <section title="&quot;targetSchema&quot; and HTTP" anchor="targetHTTP">
@@ -1128,10 +1135,29 @@
                         "Content-Location"</xref>. In particular, "targetSchema" suggests what a
                     client can expect for the response to an HTTP GET or any response for which
                     the "Content-Location" header is equal to the request URI, and what a client
-                    should send if it replaces the resource in an HTTP PUT request. Per <xref
-                        target="RFC5789">RFC 5789</xref>, the request structure for an HTTP
+                    should send if it replaces the resource in an HTTP PUT request.
+                </t>
+                <t>
+                    The media type of the representation is given by the "targetMediaType"
+                    field.  Alternatively, possible available media types MAY be advertised
+                    using an entry for the "Accept" request header field in "headerSchema".
+                </t>
+                <t>
+                    Per <xref target="RFC5789">RFC 5789</xref>, the request structure for an HTTP
                     PATCH is determined by the combination of "targetSchema" and the request
-                    media type.
+                    media type, which is conveyed by the "Accept-Patch" header.
+                </t>
+                <t>
+                    HTTP POST requests are determined by the "submissionSchema" and
+                    "submissionMediaType" fields.  Alternatively, the "Accept-Post" header has
+                    been defined and registered by the
+                    <xref target="W3C.REC-ldp-20150226">Linked Data Platform</xref>, and MAY be
+                    advertised via the "targetHints" field.
+                    <cref>
+                        What happens if both are used?  Also, "submissionSchema" is a MUST
+                        to support, while "targetHints" are at most a SHOULD.  But forbidding
+                        the use of "Accept-Post" in "targetHints" seems incorrect.
+                    </cref>
                 </t>
             </section>
             <section title='"targetHints" and HTTP'>
@@ -1148,6 +1174,36 @@
                 <t>
                     No distinction is made between headers that may appear in responses to
                     different methods, such as HEAD vs OPTIONS.
+                </t>
+                <t>
+                    It is RECOMMENDED that schema authors provide hints for the values of
+                    the following types of HTTP headers whenever applicable:
+                    <list style="symbols">
+                        <t>Method allowance</t>
+                        <t>Method-specific request media types</t>
+                        <t>Authentication challenges</t>
+                    </list>
+                </t>
+            </section>
+            <section title='"headerSchema" and HTTP'>
+                <t>
+                    Schemas SHOULD be written to describe JSON serializations that
+                    follow guidelines established by the work in progress
+                    <xref target="I-D.reschke-http-jfv">"A JSON Encoding for HTTP Header Field Values"</xref>
+                    Approaches shown in that document's examples SHOULD be applied to
+                    other similarly structured headers wherever possible.
+                </t>
+                <t>
+                    It is RECOMMENDED that schema authors describe the available usage of
+                    the following types of HTTP headers whenever applicable:
+                    <list style="symbols">
+                        <t>Content negotiation</t>
+                        <t>Authentication and authorization</t>
+                        <t>Conditional requests</t>
+                        <t>Range requests</t>
+                        <t>Cache control</t>
+                        <t>The "Prefer" header</t>
+                    </list>
                 </t>
             </section>
             <section title="Creating resources through collections">
@@ -1197,6 +1253,8 @@
                     support as a plug-in alongside support for plain JSON, XML, or other media
                     types.
                 </t>
+            </section>
+            <section title="Representation versinioning">
             </section>
             <section title="API entry point">
                 <t>
