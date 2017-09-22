@@ -1150,6 +1150,14 @@
             &I-D.nottingham-rfc5988bis;
             &I-D.kelly-json-hal;
         </references>
+        <section title="JSON Hyper-Schema and HTTP">
+            <section title="Use a single link per target URI and relation type">
+            </section>
+            <section title='HTTP methods and "targetSchema"'>
+            </section>
+            <section title="Creating resources through collections">
+            </section>
+        </section>
         <section title="Using JSON Hyper-Schema in APIs" anchor="apis">
             <t>
                 JSON Hyper-Schema is ideal for representing individual resources in hypermedia
