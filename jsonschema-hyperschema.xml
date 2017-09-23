@@ -880,6 +880,17 @@
                     use in HTML and the <xref target="RFC5988">HTTP Link header</xref>.
                 </t>
 
+                <section title='"self" links' anchor="self">
+                    <t>
+                        A hyper-schema implementation MUST recognize that a link with relation
+                        type "self" describes how a user agent can interact with the resource
+                        represented by the instance.  A "self" link MUST be resolvable
+                        from the instance, and therefore "hrefSchema" MUST NOT be present.
+                        Hyper-schema authors SHOULD use "hrefRequired" to ensure that the
+                        "self" link has all instance data that is needed for use.
+                    </t>
+                </section>
+
                 <section title="Security Considerations for &quot;self&quot; links">
                     <t>
                         When link relation of "self" is used to denote a full representation of an
