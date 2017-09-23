@@ -888,7 +888,14 @@
                         from the instance, and therefore "hrefSchema" MUST NOT be present.
                         Hyper-schema authors SHOULD use "hrefRequired" to ensure that the
                         "self" link has all instance data that is needed for use.
+                        <cref>
+                            But what about things like pagination/filtering/sorting for
+                            collections?  Technically a different URI is a different resource,
+                            no matter what part of the URI chagnes.  But people generally
+                            do not think of collection subsets quite that way.
+                        </cref>
                     </t>
+                    
                 </section>
 
                 <section title="Security Considerations for &quot;self&quot; links">
