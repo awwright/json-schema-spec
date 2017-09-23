@@ -518,12 +518,12 @@
                     </t>
                 </section>
             </section>
-            <section title="Link target">
+            <section title="Link target" anchor="target">
                 <t>
-                    A hyper-schema implementation MUST keep track of the current URI with
-                    which it is working.  Traversing a link changes the current URI from
-                    that which was used to retrieve the current instance to that which
-                    can be used to retrieve the link's target.
+                    The keywords in this section are used to construct the target URI, potentially
+                    making use of instance data.  The <xref target="hrefSchema">"hrefSchema"</xref>
+                    keyword can be used to modify this process by introducing user input, as
+                    described in the <xref target="input">link input</xref> section.
                 </t>
                 <section title="href" anchor="href">
                     <t>
@@ -568,44 +568,60 @@
                     <t>
                         The value of "href" is to be used as a URI Template, as defined in
                         <xref target="RFC6570">RFC 6570</xref>.
-                        However, some special considerations apply:
                     </t>
 
                     <section title="Values for substitution">
                         <t>
-                            The URI Template is filled out using data from some combination of an
-                            external source and the instance.
-                            Where either instance data or user agent data may be used, this section
-                            will refer simply to "data" or to a "value".
-                            When the source is important, it is specified explicitly.
-
-                            To allow the use of any object property (including the empty string) or
-                            array index, the following rules are defined:
+                            Each template variable is independently resolved to a value.  The
+                            resolution process starts from the position in the instance to which
+                            the link is attached.
                         </t>
-
                         <t>
+                            Each template variable is independently resolved to a value.
                             For a given variable name in the URI Template, the value to use is
-                            determined as follows:
+                            determined as follows.  In all cases, if there is no value at
+                            the given location, implementations MUST proceed to the next step
+                            without setting a value for the variable.
                             <list>
                                 <t>
-                                    If the data is an array, and the variable name is a
-                                    representation of a non-negative integer, then the value at the
-                                    corresponding array index MUST be used (if it exists).
+                                    If the variable name is present in
+                                    <xref target="hrefPointers">"hrefPointers"</xref>, then
+                                    the instance value to which the "hrefPointers" value points
+                                    MUST be used.
                                 </t>
                                 <t>
-                                    Otherwise, the variable name should be percent-decoded, and the
-                                    corresponding object property MUST be used (if it exists).
+                                    Otherwise, the value is looked up from the position in the
+                                    instance to which the link is attached:
+                                    <list>
+                                        <t>
+                                            If the data is an array, and the variable name is a
+                                            representation of a non-negative integer, then the
+                                            value at the corresponding array index MUST be used.
+                                        </t>
+                                        <t>
+                                            Otherwise, the variable name should be
+                                            percent-decoded, and the corresponding object property
+                                            MUST be used.
+                                        </t>
+                                    </list>
                                 </t>
                             </list>
+                            This results in a data set mapping template variable names to values
+                            loaded from instance data.
                         </t>
-
                         <t>
-                            If <xref target="hrefSchema">"hrefSchema"</xref> is present and
-                            user agent data is provided, the data MUST be a valid instance according
-                            to the value of "hrefSchema".
-                            Template variables, after the process listed above, MUST first
-                            be resolved from the user agent data instance.  Any variables left
-                            unresolved MUST be resolved from the resource instance data.
+                            Next, if <xref target="hrefSchema">"hrefSchema"</xref> is present,
+                            then it is processed starting with this data set, as described in
+                            its section.
+                        </t>
+                        <t>
+                            Finally, if <xref target="hrefRequired">"hrefRequired"</xref> is
+                            present, if any template variable that is present in "hrefRequired"
+                            still does not have a value, then the link MUST NOT be used.
+                        </t>
+                        <t>
+                            Otherwise, the data set is converted to strings as needed and used
+                            with the URI Template resolution process specified in RFC 7560.
                         </t>
 
                         <section title="Converting to strings">
@@ -637,82 +653,6 @@
                             </t>
                         </section>
                     </section>
-
-                    <section title="Missing values" anchor="missingValues">
-                        <t>
-                            Sometimes, the appropriate values will not be available.  In many
-                            cases, the URI Template behavior of simply removing variables that
-                            do not have a value will be appropriate.  An example of this is
-                            optional query parameters, the presence or absence of which does
-                            not change the nature of the link relation type.
-                        </t>
-
-                        <t>
-                            However, some variables, such as an identifier used in a path component,
-                            cannot meaningfully be omitted.  The resulting URI would be meaningless,
-                            or would require a different link relation type.  While "hrefSchema" can
-                            express a requirement for those variables that can be supplied via input,
-                            some variables must be resolved from instance data.  When that instance
-                            data is not required by the context schema, the
-                            <xref target="hrefRequired">"hrefRequired</xref> keyword may be used to
-                            indicate that when the instance data is not available, the link does
-                            not apply.
-                        </t>
-                    </section>
-                </section>
-                <section title="Resolving templated URIs">
-                    <t>
-                        URI Template variables in <xref target="href">"href"</xref> resolve from
-                        server-supplied instance data by default.  This data is drawn from the
-                        sub-instance that validated against the schema containing the LDO.
-                    </t>
-                    <t>
-                        <xref target="hrefPointers">"hrefPointers"</xref> allows adjusting
-                        the location from which instance data is resolved on a per-variable
-                        basis.
-                    </t>
-                    <t>
-                        <xref target="hrefSchema">"hrefSchema"</xref> allows a link to specify
-                        a schema for resolving template variables from client-supplied data.
-                        Regular JSON Schema validation features can be used to require resolution
-                        from user agent data, forbid it, or allow user agent data while falling back
-                        to server-supplied instance data if no user agent data is provided.
-                    </t>
-                    <t>
-                        To implement the common pattern of resolving a templated path component
-                        with server-supplied instance data while accepting user agent data to build
-                        a query string:
-                        <list style="symbols">
-                            <t>
-                                set the "hrefSchema" subschemas for the path template variables
-                                to false, to disallow user agent input
-                            </t>
-                            <t>
-                                give the query string template variables names that do not appear
-                                in the instance, to prevent resolving them from the instance
-                            </t>
-                        </list>
-                        See the "hrefSchema" section for an example of this approach.
-                    </t>
-                    <t>
-                        To implement the equivalent of an input form pre-populated with
-                        pre-existing instance data:
-                        <list style="symbols">
-                            <t>
-                                ensure that each variable in the form resolves from the appropriate
-                                field in the instance, which provides the initial value that will
-                                continue to be used if the user agent takes no action to change it
-                            </t>
-                            <t> provide a validation schema for each of those fields in
-                                "hrefSchema", to describe what user agent input may be allowed
-                                to replace it
-                            </t>
-                        </list>
-                        This can be done with variables in any component of the URI template
-                        (path, query string, etc.)  While the word "form" is used here,
-                        JSON Hyper-Schema does not constraint the nature of this interaction, which
-                        may or may not involve rendering an interactive form.
-                    </t>
                 </section>
             </section>
             <section title="Link target attributes">
@@ -834,7 +774,7 @@
                     </t>
                 </section>
             </section>
-            <section title="Link input">
+            <section title="Link input" anchor="input">
                 <t>
                     There are several ways that a client can use data with a link:
                     <list>
@@ -853,18 +793,56 @@
                         The value of the "hrefSchema" link description property MUST be
                         a valid JSON Schema.  This schema is used to validate user input
                         or other user agent data for filling out the URI Template in
-                        <xref target="href">"href"</xref>, as described in that section.
+                        <xref target="href">"href"</xref>.
                     </t>
                     <t>
                         Omitting "hrefSchema" or setting the entire schema to "false" prevents
-                        any user agent data from being accepted.
+                        any user agent data from being accepted.  In this case, resolution
+                        of the template proceeds to the next step as specified under
+                        "URI Templating" without interruption.
                     </t>
                     <t>
-                        Implementations MUST NOT attempt to validate values resolved from
-                        resource instance data with "hrefSchema".  This allows for different
-                        validation rules for user agent data, such as supporting spelled-out
-                        months for date-time input but using the standard date-time
-                        format for storage.
+                        If "hrefSchema" is present and not false, then the implementation
+                        MUST allow for input.  The input data MUST be pre-populated with
+                        the values from the data set produced up to this point in the URI
+                        template resolution step.
+                        <cref>
+                            What if additional properties are allowed?  Is the entire data
+                            set pre-populated even for fields that are not described directly
+                            by "hrefSchema"?  This would make sense if there is an explicit
+                            schema for "additionalProperties".  What if additional properties
+                            are *NOT* allowed?  Should validation fail if the data set has
+                            properties not accounted for in "hrefSchema" or should those
+                            variables be excluded from pre-population?
+                        </cref>
+                    </t>
+                    <t>
+                        After input is accepted, potentially overriding the pre-populated
+                        instance data, the resulting data set MUST successfully validate
+                        against the value of "hrefSchema".  If it does not then the link
+                        MUST NOT be used.  If it is valid, then the process given in the
+                        "URI Templating" section continues with this updated data set.
+                    </t>
+                    <t>
+                        Let's try:
+                        * Create an empty object.  This is the template data set.
+                        * Adjust locations with "hrefPointer"
+                        * Populate the object with variable names and values for each
+                          variable that resolves from an instance location with a value.
+                        * If "hrefSchema":
+                            * Create an empty object.  This is the input data set.
+                            * Pre-populate the input data set from the template data set.
+                            * Validate each input data set field individually against "hrefSchema"
+                            * If a field is present and fails to validate, remove it from
+                              the input data set, but *not* from the template data set.
+                            * Present an input interface pre-populated with the input data set
+                            * Accept input, and validate the entire resulting input data set
+                              against "hrefSchema".  If it fails, stop processing.
+                            * Update the template data set with the input data set, overridding
+                              any variable that appears in both with the input data set's value.
+                        * If "hrefRequired" lists any fields that are not present in the template
+                          data set with a (potentially null) value, stop processing.
+                        * Use the resulting template data set in the RFC 6570 resolution process.
                     </t>
                 </section>
 
