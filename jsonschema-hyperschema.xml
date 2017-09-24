@@ -516,11 +516,22 @@
                     any user agent data from being accepted.
                 </t>
                 <t>
-                    Implementations MUST NOT attempt to validate values resolved from
-                    resource instance data with "hrefSchema".  This allows for different
+                    For template variables that can be resolved from the instance, if
+                    the variable is NOT:
+                    <list style="symbols">
+                        <t>Present in "properties" with a value of false, OR</t>
+                        <t>Matching a key in "patternProperties" with a value of false, OR</t>
+                        <t>Matched by "additionalProperties" with a value of false</t>
+                    </list>
+                    then the input data set for that variable SHOULD be pre-populated
+                    with the value from the instance.
+                </t>
+                <t>
+                    Note that even when data is pre-populated from the instance, the validation
+                    schema for that variable in "hrefSchema" need not match the validation
+                    schema(s) that apply to the instance data's location.  This allows for different
                     validation rules for user agent data, such as supporting spelled-out
-                    months for date-time input but using the standard date-time
-                    format for storage.
+                    months for date-time input, but using the standard date-time format for storage.
                 </t>
                 <figure>
                     <preamble>
@@ -1397,45 +1408,51 @@ GET /foo/
             <figure>
                 <preamble>
                     For each URI Template (T), the following pseudocode describes an algorithm for
-                    resolving T into a URI-reference (R):
+                    resolving T into a URI-reference (R).  For the purpose of this algorithm,
+                    LDO kewords not present in the hyper-schema have the appropriate empty value
+                    for their type (array or object).  "attachmentPointer" is the absolute
+                    JSON Pointer for the instance location to which the LDO is attached.
+                    "InputForm" represents whatevers sort of input mechanism is appropriate.
+                    This may be a literal web form, or may be a more programmatic construct
+                    such as a callback funciton accepting specific fields and data types,
+                    with the given initial values, if any.  The "blockedByFalseSchema"
+                    checks the conditions for pre-populating instance data that are outlined
+                    in the "hrefSchema" section.
                 </preamble>
                 <artwork>
 <![CDATA[
-let attachmentPointer = ldo.getJsonPointerOfAttachementPoint()
-let attachementValue = instance.valueAt(attachmentPointer)
-
-let templateData = {}
-let templatePointers = ldo.templatePointers or {}
-let templateRequired = ldo.templateRequired or []
+templateData = {}
 
 for varname in T:
-    varname = perentDecode(varname)
+    varname = rfc3986PercentDecode(varname)
     if varname in templatePointers:
-        let maybeRelative = templatPointers[varname]
-        let locatoinPointer = resolveRelative(attachementPointer,
-                                              maybeRelative)
-        if exists(instance.valueAt(locationPointer)):
-            templateData[varname] = instance.valueAt(locationPointer)
+        valuePointer = templatePointers[varname]
+        if valuePointer is relative:
+            valuePointer = resolveRelative(attachmentPointer,
+                                           valuePointer)
+    else
+        valuePointer = attachmentPointer + "/" + varname
 
-    else if typeof attachementValue is Array and \
-            typeOf(varname) is Integer and varname >= 0 and \
-            exists attachementValue[varname]:
-        templateData[varname] = attachmentValue[varname]
+    value = instance.valueAt(valuePointer)
+    if value is defined:
+        templateData[varname] = value
 
-    else if typeof attachmentValue is Object and \
-            exists attachementValue[varname]:
-        templateData[varname] = attachmentValue[varname]
+if resolving "href" or "base" for use with "href":
+    inputData = {}
+    for varname in templateData:
+        if not blockedByFalseSchema(varname, hrefSchema)
+            inputData[varname] = templateData[varname]
+    form = new InputForm()
+    for varname in inputData:
+        if not blockedByFalseSchema(varname, hrefSchema)
+            form.addInputFieldFor(varname,
+                                  hrefSchema[varname],
+                                  inputData[varname])
+    inputData = form.acceptInput()
 
-if resolvingHref:
-    let hrefSchema = ldo.hrefSchema or true
-    fieldValidationResults = validate(hrefSchema, templateData)
-    let inputData = {}
-    for varname in fieldValidationResults:
-        if fieldValidationResults[varname] is true:
-            inputData[varname] = fieldValidationResults[varname]
-    inputData = hrefSchema.prePopulateAndAcceptInput(inputData)
-    if not validate(hrefSchema, inputData):
+    if not validate(inputData, hrefSchema):
         fatal("Input invalid, link is not usable")
+
     for varname in inputData:
         templateData[varname] = inputData[varname]
 
@@ -1444,40 +1461,32 @@ for varname in templateRequired:
         fatal("Missing required variable(s)")
 
 for varname in templateData:
-    templateData[varname] = stringEncode(templateData[varname])
+    value = templateData[varname]
+    if value is true:
+        templateData[varname] = "true"
+    else if value is false:
+        temlateData[varname] = "false"
+    else if value is null:
+        templateData[varname] = "null"
+    else if value is a number:
+        templateData[varname] =
+            bestEffortOriginalJsonString(value)
+    else:
+        templateData[varname] = rfc3986PercentEncode(value)
+
 let R = rfc6570ResolutionAlgorithm(T, templateData)
 ]]>
                 </artwork>
-            </figure>
-
-            <section title="Converting to strings">
-                    <t>
-                    When any value referenced by the URI template is null, a boolean or
-                    a number, then it should first be converted into a string as
-                    follows:
-                    <list>
-                        <t>
-                            null values SHOULD be replaced by the text "null"
-                        </t>
-                        <t>
-                            boolean values SHOULD be replaced by their lower-case
-                            equivalents: "true" or "false"
-                        </t>
-                        <t>
-                            numbers SHOULD be replaced with their original JSON
-                            representation.
-                        </t>
-                    </list>
-                </t>
-                <t>
+                <postamble>
                     In some software environments the original JSON representation of a
                     number will not be available (there is no way to tell the difference
                     between 1.0 and 1), so any reasonable representation should be used.
                     Schema and API authors should bear this in mind, and use other types
                     (such as string or boolean) if the exact representation is
-                    important.
-                </t>
-            </section>
+                    important.  If the number was provide as input in the form of a
+                    string, the string used as input SHOULD be used.
+                </postamble>
+            </figure>
         </section>
 
 <!--
