@@ -1444,16 +1444,20 @@ for varname in T:
         templateData[varname] = value
 
 if resolving "href" or "base" for use with "href":
-    inputData = {}
-    for varname in templateData:
-        if not blockedByFalseSchema(varname, hrefSchema)
-            inputData[varname] = templateData[varname]
     form = new InputForm()
-    for varname in inputData:
-        if not blockedByFalseSchema(varname, hrefSchema)
+
+    for varname in T:
+        usable = true
+        for schema in getApplicableSchemas(hrefSchema,
+                                           "/" + varname):
+            if not validate(templateData[varname], schema):
+                usable = false
+                break
+        
+        if usable:
             form.addInputFieldFor(varname,
                                   hrefSchema[varname],
-                                  inputData[varname])
+                                  templateData[varname])
     inputData = form.acceptInput()
 
     if not validate(inputData, hrefSchema):
