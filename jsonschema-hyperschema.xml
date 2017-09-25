@@ -1421,6 +1421,12 @@ GET /foo/
                 </preamble>
                 <artwork>
 <![CDATA[
+# Start from "href" or "anchor", if the result is not an
+# absolute URI, move up looking for "base".  Resolve each
+# new "base" and combine with the prior resolved reference
+# before deciding whether to continue searching for another
+# base, as it is possible to write a template that could
+# produce either a URI or a URI-reference.
 templateData = {}
 
 for varname in T:
