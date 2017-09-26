@@ -190,6 +190,14 @@
                 sections and keyword group overviews.
             </t>
             <section title="Link discovery">
+                <t>
+                    Before links can be used, they must be discovered.  JSON Hyper-Schema provides
+                    for two ways to discover links: based on the location in the instance to which
+                    they are attached, and based on the link context.  While the link context is
+                    the traditional notion of the "source" end of the link, the attachment point
+                    is often more useful with JSON instances, as it associates the link with
+                    the JSON data to which it is most relevant.
+                </t>
                 <section title="By attachment location">
                     <t>
                         An implementation MUST find and make accessible all links in
@@ -221,6 +229,15 @@
                 </section>
             </section>
             <section title="Link usage">
+                <t>
+                    Once discovered, a link is generally selected based on its link relation
+                    type, and used by communicating with the resource at the target URI.
+                    This means that the target URI must be correctly computed based on the
+                    instance data and optionally on input.  The context URI must similarly
+                    be calculated, although typically only for use in context-based discovery
+                    as described above.  Finally, implementations need to recognize link
+                    relation types that have well-known semantics within JSON Hyper-Schema.
+                </t>
                 <section title="Target and context identification">
                     <t>
                         For a given link, an implementation MUST be able to identify the
@@ -245,9 +262,9 @@
                     <t>
                         In order to encourage treating context and target URIs as opaque
                         identifiers, implementations MAY opt to hide those fields that
-                        are only used in URI construction: "href", "templatePointers", "templateRequired",
-                        "anchor", and "anchorPointer".  Implementations MAY offer a configuration
-                        option to enable or disable encapsulation.
+                        are only used in URI construction: "href", "templatePointers",
+                        "templateRequired", "anchor", and "anchorPointer".  Implementations
+                        MAY offer a configuration option to enable or disable encapsulation.
                     </t>
                 </section>
                 <section title="Recognizing standard link relation types">
@@ -255,8 +272,8 @@
                         Implementations MUST recognize a link with a "self" relation typd as
                         describing the possible interactions with the resource represented by
                         the instance data.  Collections MUST be recognized based on traversing
-                        a "collection" link, and MAY be recognized based on the presence of
-                        an "item" link which has as its context the instance or a sub-instance.
+                        a "collection" link, or on discovering an "item" link which has the
+                        instance or sub-instance as its context.
                     </t>
                 </section>
                 <section title="Providing access to target attributes and input schemas">
@@ -290,6 +307,22 @@
                         coordinating all of them is specific to Hyper-Schema and beneficial
                         to automate.
                     </cref>
+                </t>
+            </section>
+            <section title="Streaming parsers">
+                <t>
+                    The requirements around discovering links based on their context, or
+                    using the context of links to identify collections, present unique
+                    challenges when used with streaming parsers.  It is not possible to
+                    authoritatively fulfill these requirments without processing the entire
+                    schema and instance documents.
+                </t>
+                <t>
+                    Such implementations MAY chooose to return non-authoritative answers
+                    based on data processed to date.  When offering this approach,
+                    implementations MUST be clear on the nature of the response, and MUST
+                    offer an option to block and wait until all data is processed and
+                    an authoritative answer can be returned.
                 </t>
             </section>
         </section>
@@ -1202,7 +1235,7 @@ for varname in templateData:
             &I-D.kelly-json-hal;
             &ldp;
         </references>
-        <section title="JSON Hyper-Schema and HTTP">
+        <section title="JSON Hyper-Schema and HTTP" anchor="HTTP">
             <t>
                 While JSON Hyper-Schema is a hypermedia format and therefore protocol-independent,
                 its most common expected use is in HTTP systems, or systems using protocols
