@@ -198,33 +198,35 @@
                     is often more useful with JSON instances, as it associates the link with
                     the JSON data to which it is most relevant.
                 </t>
-                <section title="By attachment location">
+                <t>
+                    In both approaches, the relevant <xref target="base">"base"</xref>
+                    values MUST be included as described in that keyword's section.
+                </t>
+                <section title="By hyper-schema applicability">
                     <t>
-                        An implementation MUST find and make accessible all links in
-                        all (sub)schemas which are applicable to the (sub-)instance.
-                        These links MUST all be presented as a single set, regardless
-                        of the number of subschemas involved.  Links that cannot fulfill
+                        An implementation MUST find and make the links in all applicable
+                        (sub)schemas available to clients.  Schema applicability is defined
+                        in <xref target="json-schema-validation">Section 10.1 of the JSON Schema
+                        validation specification</xref>.  Links that cannot fulfill
                         their "templateRequired" keyword based on the instance and/or potential
                         client input MUST be excluded.
+                    </t>
+                    <t>
+                        These links MUST all be presented as a single set, regardless
+                        of the number of subschemas involved.  The order of links in the set
+                        is not significant.
                     </t>
                 </section>
                 <section title="By link context location">
                     <t>
-                        In addition to providing the set of links applicable to a location in the
-                        instance, an implementation that considers the entire instance and schema
-                        at once MUST make accessible the set of links for which a given location
-                        is the link's context.  All such links MUST be in at least one set of links
-                        produced by examining all attachment locations in the instance.
-                    </t>
-                    <t>
-                        Streaming implementations MAY opt to only provide links that have
-                        already appeared in the stream rather than blocking in order to process
-                        the entire stream (which may be unbounded).
+                        Implementations MUST also make accessible the set of links for which
+                        a given instance location is the link's context.  All such links MUST
+                        be in at least one set of links produced by examining schema applicability.
                     </t>
                     <t>
                         Link sets based on a context can include links attached to elements
                         of an ordered array.  Implementations MUST preserve the order of
-                        such links with respect to each other.
+                        such links with respect to each other.  Order is not otherwise significant.
                     </t>
                 </section>
             </section>
@@ -234,7 +236,7 @@
                     type, and used by communicating with the resource at the target URI.
                     This means that the target URI must be correctly computed based on the
                     instance data and optionally on input.  The context URI must similarly
-                    be calculated, although typically only for use in context-based discovery
+                    be calculated, although often only for use in context-based discovery
                     as described above.  Finally, implementations need to recognize link
                     relation types that have well-known semantics within JSON Hyper-Schema.
                 </t>
@@ -262,8 +264,9 @@
                     <t>
                         In order to encourage treating context and target URIs as opaque
                         identifiers, implementations MAY opt to hide those fields that
-                        are only used in URI construction: "href", "templatePointers",
-                        "templateRequired", "anchor", and "anchorPointer".  Implementations
+                        are only used in URI construction ("href", "templatePointers",
+                        "templateRequired", "anchor", and "anchorPointer") when making
+                        the remainder of the LDO available to clients.  Implementations
                         MAY offer a configuration option to enable or disable encapsulation.
                     </t>
                 </section>
@@ -343,7 +346,7 @@
                 are optional. The minimal valid JSON Hyper-schema is the blank object.
             </t>
 
-            <section title="base">
+            <section title="base" anchor="base">
                 <t>
                     If present, this keyword is resolved against the current URI base that the
                     entire instance is found within, and sets the new URI base for URI references
@@ -581,97 +584,6 @@
                         process, if any variable that is present in this array does not have
                         a value, the link MUST NOT be used.
                     </t>
-                </section>
-
-                <section title="URI Templating">
-                    <t>
-                        The value of "href" is to be used as a URI Template, as defined in
-                        <xref target="RFC6570">RFC 6570</xref>.
-                    </t>
-
-                    <section title="Values for substitution">
-                        <t>
-                            Each template variable is independently resolved to a value.  The
-                            resolution process starts from the position in the instance to which
-                            the link is attached.
-                        </t>
-                        <t>
-                            Each template variable is independently resolved to a value.
-                            For a given variable name in the URI Template, the value to use is
-                            determined as follows.  In all cases, if there is no value at
-                            the given location, implementations MUST proceed to the next step
-                            without setting a value for the variable.
-                            <list>
-                                <t>
-                                    If the variable name is present in
-                                    <xref target="templatePointers">"templatePointers"</xref>, then
-                                    the instance value to which the "templatePointers" value points
-                                    MUST be used.
-                                </t>
-                                <t>
-                                    Otherwise, the value is looked up from the position in the
-                                    instance to which the link is attached:
-                                    <list>
-                                        <t>
-                                            If the data is an array, and the variable name is a
-                                            representation of a non-negative integer, then the
-                                            value at the corresponding array index MUST be used.
-                                        </t>
-                                        <t>
-                                            Otherwise, the variable name should be
-                                            percent-decoded, and the corresponding object property
-                                            MUST be used.
-                                        </t>
-                                    </list>
-                                </t>
-                            </list>
-                            This results in a data set mapping template variable names to values
-                            loaded from instance data.
-                        </t>
-                        <t>
-                            Next, if <xref target="hrefSchema">"hrefSchema"</xref> is present,
-                            then it is processed starting with this data set, as described in
-                            its section.
-                        </t>
-                        <t>
-                            Finally, if <xref target="templateRequired">"templateRequired"</xref> is
-                            present, if any template variable that is present in "templateRequired"
-                            still does not have a value, then the link MUST NOT be used.
-                        </t>
-                        <t>
-                            Otherwise, the data set is converted to strings as needed and used
-                            with the URI Template resolution process specified in RFC 7560.
-                        </t>
-
-                        <section title="Converting to strings">
-                            <t>
-                                When any value referenced by the URI template is null, a boolean or
-                                a number, then it should first be converted into a string as
-                                follows:
-                                <list>
-                                    <t>
-                                        null values SHOULD be replaced by the text "null"
-                                    </t>
-                                    <t>
-                                        boolean values SHOULD be replaced by their lower-case
-                                        equivalents: "true" or "false"
-                                    </t>
-                                    <t>
-                                        numbers SHOULD be replaced with their original JSON
-                                        representation.
-                                    </t>
-                                </list>
-                            </t>
-                            <t>
-                                In some software environments the original JSON representation of a
-                                number will not be available (there is no way to tell the difference
-                                between 1.0 and 1), so any reasonable representation should be used.
-                                Schema and API authors should bear this in mind, and use other types
-                                (such as string or boolean) if the exact representation is
-                                important.
-                            </t>
-                        </section>
-                    </section>
                 </section>
             </section>
             <section title="Link target attributes">
@@ -1117,8 +1029,9 @@ for varname in templateData:
             </section>
         </section>
 
-        <section title="Security Considerations">
-            <section title="Security Considerations for &quot;self&quot; links">
+        <section title="Security Considerations" anchor="security">
+            <t><cref>Need to reference the core and validation security considerations.</cref></t>
+            <section title='"self" links'>
                 <t>
                     When link relation of "self" is used to denote a full representation of an
                     object, the user agent SHOULD NOT consider the representation to be the
@@ -1128,21 +1041,18 @@ for varname in templateData:
                     link.
                 </t>
             </section>
-            <section title="Security Considerations for &quot;targetSchema&quot;">
+            <section title="Target attributes">
                 <t>
                     This property has similar security concerns to that of "targetMediaType".
                     Clients MUST NOT use the value of this property to aid in the interpretation
                     of the data received in response to following the link, as this leaves
                     "safe" data open to re-interpretation.
                 </t>
-            </section>
-            <section title="Security concerns for &quot;targetMediaType&quot;">
                 <t>
                     The "targetMediaType" property in link definitions defines the expected
                     format of the link's target.
                     However, this is advisory only, and MUST NOT be considered authoritative.
                 </t>
-
                 <t>
                     When choosing how to interpret data, the type information provided by the
                     server (or inferred from the filename, or any other usual method) MUST be
@@ -1154,7 +1064,6 @@ for varname in templateData:
                     first verify that the data is of a type that would normally be passed to
                     that external program.
                 </t>
-
                 <t>
                     This is to guard against re-interpretation of "safe" data, similar to the
                     precautions for "targetSchema".
