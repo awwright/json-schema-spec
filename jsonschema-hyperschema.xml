@@ -193,7 +193,7 @@
                 <section title="By attachment location">
                     <t>
                         An implementation MUST find and make accessible all links in
-                        all (sub)schemas against which this (sub)instance is valid.
+                        all (sub)schemas which are applicable to the (sub-)instance.
                         These links MUST all be presented as a single set, regardless
                         of the number of subschemas involved.  Links that cannot fulfill
                         their "hrefRequired" keyword based on the instance and/or potential
@@ -202,7 +202,7 @@
                 </section>
                 <section title="By link context location">
                     <t>
-                        In addition to providing the set of links attached to a location in the
+                        In addition to providing the set of links applicable to a location in the
                         instance, an implementation that considers the entire instance and schema
                         at once MUST make accessible the set of links for which a given location
                         is the link's context.  All such links MUST be in at least one set of links
