@@ -302,13 +302,13 @@
                         This is vague.  I'm trying to convey that most uses of Hyper-Schema
                         would benefit from including integration with the media types, URI schemes,
                         and protocols, such as automatically validating submission data against
-                        "submissionSchema", encoding it according to "submissionMediaType", examining
-                        the URI for the "http" or "https" scheme, validating JSON representations of
-                        headers against "headerSchema", serializing them into HTTP header format,
-                        and constructing the appropriate POST request.  While many of those
-                        activities are technically outside of the scope of Hyper-Schema,
-                        coordinating all of them is specific to Hyper-Schema and beneficial
-                        to automate.
+                        "submissionSchema", encoding it according to "submissionMediaType",
+                        examining the URI for the "http" or "https" scheme, validating JSON
+                        representations of headers against "headerSchema", serializing them
+                        into HTTP header format, and constructing the appropriate POST request.
+                        While many of those activities are technically outside of the scope of
+                        Hyper-Schema, coordinating all of them is specific to Hyper-Schema and
+                        beneficial to automate.
                     </cref>
                 </t>
             </section>
@@ -331,14 +331,14 @@
         </section>
         <section title="Schema keywords">
             <t>
-                Hyper-schema keywords can be applied when the instance is valid against
-                the schema that includes those keywords, as outlined in
-                <xref target="json-schema-validation">Section 10.1 of JSON Schema validation</xref>.
+                Hyper-schema keywords from all schemas that are applicable to a position
+                in an instance, as defined by <xref target="json-schema-validation">Section
+                10.1 of JSON Schema validation</xref>, can be used with that instance.
             </t>
             <t>
                 When multiple subschemas are applicable to a given sub-instance, all "link"
-                arrays MUST be concatenated, in any order, into a single array.  Each object
-                in the resulting array MUST retain its own list of applicable "base" values,
+                arrays MUST be combined, in any order, into a single set.  Each object
+                in the resulting set MUST retain its own list of applicable "base" values,
                 in resolution order, from the same schema and any parent schemas.
             </t>
             <t>
@@ -348,16 +348,16 @@
 
             <section title="base" anchor="base">
                 <t>
-                    If present, this keyword is resolved against the current URI base that the
-                    entire instance is found within, and sets the new URI base for URI references
-                    within the instance.
-                    It is therefore the first URI Reference resolved, regardless of the order in
-                    which it was found.
+                    If present, this keyword MUST be first <xref target="uriTemplating">resolved as
+                    a URI Template</xref>, and then MUST be resolved as a URI Reference against the
+                    current URI base of the instance.  The result MUST be set as the new URI
+                    base for the instance while processing the sub-schema containing "base"
+                    and all sub-schemas within it.
                 </t>
                 <t>
-                    The URI is computed from the provided URI template using the same process
-                    described for the <xref target="href">"href"</xref> property of a Link
-                    Description Object.
+                    The process for resolving the "base" template can be different when being
+                    resolved for use with "anchor" than when being resolved for use with "href",
+                    which is explained in detail in the URI Templating section.
                 </t>
             </section>
 
@@ -875,7 +875,7 @@
             </section>
         </section>
 
-        <section title="URI Templating">
+        <section title="URI Templating" anchor="uriTemplating">
             <t>
                 Three hyper-schema keywords are <xref target="RFC6570">URI Templates</xref>:
                 "base", "anchor", and "href".  Each are resolved separately to URI-references,
