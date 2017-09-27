@@ -384,14 +384,18 @@
                 for use with the links in various ways.
             </t>
             <t>
-                Due to the use of URI Templates to identify link targets, as well as further use
-                of client input, an LDO is a link template that may resolve to multiple links when
-                used with a JSON instance document.
+                Due to the use of URI Templates to identify link contexts and targets, as well
+                as optional further use of client input when identifying targets, an LDO is
+                a link template that may resolve to multiple links when used with a JSON
+                instance document.
             </t>
             <t>
                 A specific use of an LDO, typically involving a request and response across
                 a protocol, is referred to as an operation.  For many protocols, multiple
-                operations are possible on any given link.
+                operations are possible on any given link.  The protocol is indicated by
+                the target's URI scheme.  Note that not all URI schemes indicate a protocol
+                that can be used for communications, and even resources with URI schemes that
+                do indicate such protocols need not be available over that protocol.
             </t>
             <t>
                 A Link Description Object MUST be an object, and the
@@ -410,25 +414,28 @@
 
             <section title="Link context" anchor="context">
                 <t>
-                    In JSON Hyper-Schema, the link's context resource is, by default, the specific
-                    location in the instance that validates against the schema containing the LDO.
-                    This is often not the entire instance document.  This default context can
-                    be changed using the keywords in this section.
+                    In JSON Hyper-Schema, the link's context resource is, by default, the
+                    sub-instance to which it is attached (as defined by
+                    <xref target="json-schema-validation">Section 10.1 of the JSON Schema
+                    validation specification</xref>).  This is often not the entire instance
+                    document.  This default context can be changed using the keywords
+                    in this section.
                 </t>
                 <t>
                     Depending on the media type of the instance, it may or may not be possible
                     to assign a URI to the exact default context resource.  In particular,
-                    application/json does not define URI fragment resolution semantics, so
-                    properties or array elements within a plain JSON document cannot be identified
-                    by a URI.  When it is not possible to produce a complete URI, the position
-                    of the context SHOULD be conveyed by a the URI of the instance document,
-                    together with a separate plain-string JSON Pointer.
+                    application/json does not define a URI fragment resolution syntax, so
+                    properties or array elements within a plain JSON document cannot be fully
+                    identified by a URI.  When it is not possible to produce a complete URI,
+                    the position of the context SHOULD be conveyed by a the URI of the instance
+                    document, together with a separate plain-string JSON Pointer.
                 </t>
                 <t>
                     Implementations MUST be able to construct the link context's URI, and
                     (if necessary for full identification), a JSON Pointer in string representation
                     form as per <xref target="RFC6901">RFC 6901, section 5</xref> in place of
-                    a URI fragment.
+                    a URI fragment.  The process for construcing a URI based on a URI template
+                    is given in the <xref target="uriTemplating">URI Templating</xref> section.
                 </t>
                 <section title="anchor" anchor="anchor">
                     <t>
@@ -494,9 +501,12 @@
                 <section title='"self" links' anchor="self">
                     <t>
                         A hyper-schema implementation MUST recognize that a link with relation
-                        type "self" describes how a user agent can interact with the resource
-                        represented by the instance.  A "self" link MUST be resolvable
-                        from the instance, and therefore "hrefSchema" MUST NOT be present.
+                        type "self" that is applicable to the entire instance document describes    
+                        how a user agent can interact with the resource represented by that
+                        instance document.  A "self" link MUST be resolvable from the instance,
+                        and therefore "hrefSchema" MUST NOT be present.
+                    </t>
+                    <t>
                         Hyper-schema authors SHOULD use "templateRequired" to ensure that the
                         "self" link has all instance data that is needed for use.
                     </t>
@@ -508,9 +518,8 @@
                         additional semantics on collection resources indicated by these types.
                     </t>
                     <t>
-                        Implementations MUST recognize the target of a "collection" link as
-                        a collection, and SHOULD recognize that the context resource of an
-                        "item" link is a collection.
+                        Implementations MUST recognize the target of a "collection" link and
+                        the context of an "item" link as collections.
                     </t>
                     <t>
                         A well-known design pattern in hypermedia is to use a collection resource
@@ -549,10 +558,13 @@
             </section>
             <section title="Link target" anchor="target">
                 <t>
-                    The keywords in this section are used to construct the target URI, potentially
-                    making use of instance data.  The <xref target="hrefSchema">"hrefSchema"</xref>
-                    keyword can be used to modify this process by introducing user input, as
-                    described in the <xref target="input">link input</xref> section.
+                    The target URI template is used to identify the link's target, potentially
+                    making use of instance data.  Additionally, with
+                    <xref target="hrefSchema">"hrefSchema"</xref>, this template can identify
+                    a set of possible target resources to use based on client input.
+                    The full process of resolvling the URI template, with or without client
+                    input, is covered in the <xref target="uriTemplating">URI Templating<xref>
+                    section.
                 </t>
                 <section title="href" anchor="href">
                     <t>
@@ -566,21 +578,36 @@
                         This property is REQUIRED.
                     </t>
                 </section>
+            </section>
+
+            <section title="Adjusting URI Template resolution">
+                <t>
+                    The keywords in this section are used when resolving all URI Tempaltes
+                    involved in hyper-schema: "base", "anchor", and "href".  See the
+                    <xref target="uriTemplating">URI Templating</xref> section for the complete
+                    template resolution algorithm.
+                </t>
+                <t>
+                    Note that when resolving a "base" template, the attachment point from
+                    which resolution begins is the attachment point of the "href" or "anchor"
+                    keyword being resolved which requires "base" templates to be resolved,
+                    not the attachment point of the "base" kewyord itself.
+                </t>
                 <section title="templatePointers" anchor="templatePointers">
                     <t>
                         The value of the "templatePointers" link description property MUST be
                         an object.  Each property value in the object MUST be a valid
                         <xref target="RFC6901">JSON Pointer</xref>, or a valid
                         <xref target="I-D.luff-relative-json-pointer">Relative JSON Pointer</xref>
-                        which is evaluated relative to the position in the instance from which
-                        <xref target="href">"href"</xref> template variable resolution would
-                        normally begin.
+                        which is evaluated relative to the attachment point of the link
+                        for which the template is being resolved.
                     </t>
                     <t>
                         For each property name in the object that matches a variable name in the
-                        "href" URI Template, the value of that property adjusts the starting position
-                        of variable resolution for that variable.  Properties which do not match
-                        "href" template variable names MUST be ignored.
+                        template being resolved, the value of that property adjusts the starting
+                        position of variable resolution for that variable.  Properties which
+                        do not match template variable names in the template being resolved
+                        MUST be ignored.
                     </t>
                 </section>
                 <section title="templateRequired" anchor="templateRequired">
@@ -593,7 +620,14 @@
                     </t>
                 </section>
             </section>
+
             <section title="Link target attributes">
+                <t>
+                    All properties in this section are advisory only.  While keywords such
+                    as "title" and "description" are used primarily to present the link
+                    to users, those keywords that predict the nature of a link interaction
+                    or response MUST NOT
+                </t>
                 <section title="title">
                     <t>
                         This property defines a title for the link.
@@ -620,12 +654,41 @@
                     </t>
                 </section>
 
+                <section title="targetMediaType">
+                    <t>
+                        The value of this property represents the media type
+                        <xref target="RFC2046">RFC 2046</xref>, that is expected to be returned
+                        when fetching this resource.  This property value MAY be a media range
+                        instead, using the same pattern defined in
+                        <xref target="RFC7231">RFC 7231, section 5.3.2 - HTTP "Accept" header</xref>.
+                    </t>
+
+                    <t>
+                        This property is analogous to the "type" property of other link
+                        serialization formats.  User agents MAY use this information to inform
+                        the interface they present to the user before the link is followed,
+                        but MUST NOT use this information in the interpretation of the resulting
+                        data.  Instead, a client MUST use the media type given by the response for
+                        run-time interpretation.  See the section on
+                        <xref target="security">"Security Concerns"</xref> for a detailed
+                        examination of mis-use of "targetMediaType".
+                    </t>
+
+                    <t>
+                        If this property's value is not specified, then the value should be taken
+                        to be "application/json".  Hyper-Schema authors SHOULD NOT use a protocol-specific
+                        value in <xref target="targetHints">"targetHints"</xref> for this purpose.
+                    </t>
+                </section>
+
                 <section title="targetSchema" anchor="targetSchema">
                     <t>
                         This property provides a schema that is expected to describe
                         the link target's representation.  Depending on the protocol,
-                        the schema may or may not describe the response to any particular
-                        request sent to the link.  This property is advisory only.
+                        the schema may or may not describe the request or response to
+                        any particular operation performed with the link. See the
+                        <xref target="HTTP">JSON Hyper-Schema and HTTP<xref> section for
+                        an in-depth discussion of how this keyword is used with HTTP.
                     </t>
                 </section>
 
@@ -673,42 +736,6 @@
                     <t>
                         Clients MUST NOT assume that an implementation will automatically take any
                         action based on the value of this property.
-                    </t>
-                </section>
-
-                <section title="targetMediaType">
-                    <t>
-                        The value of this property is advisory only, and represents the media type
-                        <xref target="RFC2046">RFC 2046</xref>, that is expected to be returned when
-                        fetching this resource.
-                        This property value MAY be a media range instead, using the same pattern defined
-                        in <xref target="RFC7231">RFC 7231, section 5.3.2 - HTTP "Accept" header</xref>.
-                    </t>
-
-                    <t>
-                        This property is analogous to the "type" property of &lt;a&gt; elements in HTML
-                        (advisory content type), or the "type" parameter in the
-                        <xref target="RFC5988">HTTP Link header</xref>.
-                        User agents MAY use this information to inform the interface they present to the
-                        user before the link is followed, but this information MUST NOT use this
-                        information in the interpretation of the resulting data.
-                        When deciding how to interpret data obtained through following this link, the
-                        behaviour of user agents MUST be identical regardless of the value of the this
-                        property.
-                    </t>
-
-                    <t>
-                        If this property's value is specified, and the link's target is to be obtained
-                        using any protocol that supports the HTTP/1.1 "Accept" header
-                        <xref target="RFC7231">RFC 7231, section 5.3.2</xref>, then user agents MAY use
-                        the value of this property to aid in the assembly of that header when making the
-                        request to the server.
-                    </t>
-
-                    <t>
-                        If this property's value is not specified, then the value should be taken to be
-                        "application/json".  Hyper-Schema authors SHOULD NOT use a protocol-specific
-                        value in <xref target="targetHints">"targetHints"</xref> for this purpose.
                     </t>
                 </section>
             </section>
@@ -794,13 +821,14 @@
                         schemas for headers that are not relevant to that request.
                     </t>
                 </section>
+
                 <section title="Manipulating the target resource representation">
                     <t>
                         In JSON Hyper-Schema, <xref target="targetSchema">"targetSchema"</xref>
                         supplies a non-authoritative description of the target resource's
                         representation. A client can use "targetSchema" to structure input for
                         replacing or modifying the representation, or as the base representation
-                        for buildign a patch document based on a patch media type.
+                        for building a patch document based on a patch media type.
                     </t>
                     <t>
                         Alternatively, if "targetSchema" is absent or if the client prefers to
@@ -816,6 +844,7 @@
                         examples.
                     </t>
                 </section>
+
                 <section title="Submitting data for processing">
                     <t>
                         The <xref target="submissionSchema">"submissionSchema"</xref> and
@@ -867,7 +896,13 @@
                                 Is this correct?  In draft-06 this was the only way to signal
                                 support for data submission, but now we have "targetHints" for
                                 that.  It may make more sense for this to default to behaving
-                                as if the schema is set to true.
+                                as if the schema is set to true.  The original idea was that
+                                both this keyword and "hrefSchema" indicated the presence
+                                of optional functionality.  This makes sense for "hrefSchema",
+                                as it is used with "href" which is owned by the hyper-schema.
+                                However, "submissionSchema" describes a message that is
+                                supposedly accepted by the target resource.  In general, we
+                                choose defaults that avoid constraining target behavior.
                             </cref>
                         </t>
                     </section>
@@ -1188,7 +1223,7 @@ for varname in templateData:
                     that controls the operation's availability.
                 </t>
             </section>
-            <section title="&quot;targetSchema&quot; and HTTP" anchor="targetHTTP">
+            <section title='"targetSchema" and HTTP' anchor="targetHTTP">
                 <t>
                     The relationship between a resource's representation and HTTP requests and
                     responses is determined by <xref target="RFC7231">RFC 7231, section 4.3.1 -
@@ -1220,6 +1255,15 @@ for varname in templateData:
                         the use of "Accept-Post" in "targetHints" seems incorrect.
                     </cref>
                 </t>
+<!-- targetMediaType and "Accept"
+                    <t>
+                        If this property's value is specified, and the link's target is to be obtained
+                        using any protocol that supports the HTTP/1.1 "Accept" header
+                        <xref target="RFC7231">RFC 7231, section 5.3.2</xref>, then user agents MAY use
+                        the value of this property to aid in the assembly of that header when making the
+                        request to the server.
+                    </t>
+  -->
             </section>
             <section title='Optimizing HTTP discoverability with "targetHints"'>
                 <t>
