@@ -5,6 +5,20 @@
     "type": "object",
     "required": [ "href" ],
     "properties": {
+        "anchor": {
+            "type": "string",
+            "format": "uri-template"
+        },
+        "anchorPointer": {
+            "type": "string",
+            "anyOf": [
+                { "format": "json-pointer" },
+                { "pattern": "^[0-9]" }
+            ]
+        },
+        "rel": {
+            "type": "string"
+        },
         "href": {
             "type": "string",
             "format": "uri-template"
@@ -19,30 +33,11 @@
                 ]
             }
         },
-        "hrefSchema": {
-            "allOf": [
-                { "$ref": "http://json-schema.org/draft-06/hyper-schema#" }
-            ]
-        },
         "templateRequired": {
             "type": "array",
             "items": {
                 "type": "string"
             }
-        },
-        "rel": {
-            "type": "string"
-        },
-        "anchor": {
-            "type": "string",
-            "format": "uri-template"
-        },
-        "anchorPointer": {
-            "type": "string",
-            "anyOf": [
-                { "format": "json-pointer" },
-                { "pattern": "^[0-9]" }
-            ]
         },
         "title": {
             "type": "string"
@@ -55,9 +50,14 @@
                 { "$ref": "http://json-schema.org/draft-06/hyper-schema#" }
             ]
         },
-        "targetHints": { },
         "targetMediaType": {
             "type": "string"
+        },
+        "targetHints": { },
+        "hrefSchema": {
+            "allOf": [
+                { "$ref": "http://json-schema.org/draft-06/hyper-schema#" }
+            ]
         },
         "headerSchema": {
             "allOf": [
