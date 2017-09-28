@@ -660,9 +660,9 @@
                         <xref target="RFC2046">RFC 2046</xref>, that is expected to be returned
                         when fetching this resource.  This property value MAY be a media range
                         instead, using the same pattern defined in
-                        <xref target="RFC7231">RFC 7231, section 5.3.2 - HTTP "Accept" header</xref>.
+                        <xref target="RFC7231">RFC 7231, section 5.3.2 -
+                        HTTP "Accept" header</xref>.
                     </t>
-
                     <t>
                         This property is analogous to the "type" property of other link
                         serialization formats.  User agents MAY use this information to inform
@@ -673,11 +673,19 @@
                         <xref target="security">"Security Concerns"</xref> for a detailed
                         examination of mis-use of "targetMediaType".
                     </t>
-
                     <t>
-                        If this property's value is not specified, then the value should be taken
-                        to be "application/json".  Hyper-Schema authors SHOULD NOT use a protocol-specific
-                        value in <xref target="targetHints">"targetHints"</xref> for this purpose.
+                        For protocols supporting content-negotiation, implementations MAY choose to
+                        describe possible target media types using protocol-specific information in
+                        <xref target="headerSchema">"headerSchema"</xref>.  If both
+                        protocol-specific information and "targtMediaType" are present, then the
+                        value of "targetMediaType" MUST be compatible with the protocol-specific
+                        information, and SHOULD indicate the media type that will be returned in the
+                        absence of content negotiation.
+                    </t>
+                    <t>
+                        When no such protocol-specific information is available, or when the
+                        implementation does not recognize the protocol involved, then the value
+                        SHOULD be taken to be "application/json".
                     </t>
                 </section>
 
@@ -730,20 +738,25 @@
                     </t>
                     <t>
                         Implementations MUST NOT assume that all discoverable information is
-                        accounted for in this object.  Clients MUST properly handle run-time responses
-                        that contradict this property's values.
+                        accounted for in this object.  Clients MUST properly handle run-time
+                        responses that contradict this property's values.
                     </t>
                     <t>
                         Clients MUST NOT assume that an implementation will automatically take any
                         action based on the value of this property.
                     </t>
+                    <t>
+                        See <xref target="HTTP">"JSON Hyper-Schema and HTTP"</xref> for
+                        guidance on using this keyword with HTTP and analogous protocols.
+                    </t>
                 </section>
             </section>
             <section title="Link input" anchor="input">
                 <t>
-                    The four ways to use client-supplied data are each addressed by a separate
-                    schema keyword within the link description object.  When performing operations,
-                    clients SHOULD ignore schemas that are not relevant to their semantics.
+                    There are four ways to use client-supplied data with a link, and each
+                    is addressed by a separate link description object keyword.  When performing
+                    operations, clients SHOULD ignore schemas that are not relevant to their
+                    semantics.
                 </t>
                 <section title="hrefSchema" anchor="hrefSchema">
                     <t>
@@ -757,8 +770,9 @@
                         any user agent data from being accepted.
                     </t>
                     <t>
-                        Setting any subschema that applies to a particular variable to "false"
-                        prevents any user agent data from being accepted for that single variable.
+                        Setting any subschema that applies to a particular variable to the
+                        JSON literal value "false" prevents any user agent data from being
+                        accepted for that single variable.
                     </t>
                     <t>
                         For template variables that can be resolved from the instance data,
@@ -813,7 +827,10 @@
                         The exact mapping of the JSON data model into the headers is
                         protocol-dependent.  However, in most cases this schema SHOULD
                         specify a type of "object", and the property names SHOULD be
-                        lower-cased forms of the control data field names.
+                        lower-cased forms of the control data field names.  See the
+                        <xref target="HTTP">"JSON Hyper-Schema and HTTP"</xref> section
+                        for detailed guidance on using this keyword with HTTP and
+                        analogous protocols.
                     </t>
                     <t>
                         "headerSchema" is applicable to any request method or command that the
@@ -1085,10 +1102,10 @@ for varname in templateData:
             </section>
             <section title="Target attributes">
                 <t>
-                    This property has similar security concerns to that of "targetMediaType".
-                    Clients MUST NOT use the value of this property to aid in the interpretation
-                    of the data received in response to following the link, as this leaves
-                    "safe" data open to re-interpretation.
+                    <cref>
+                        This whole section needs more work, but I do like having security
+                        concerns around target interactions consolidated and addressed as a whole.
+                    </cref>
                 </t>
                 <t>
                     The "targetMediaType" property in link definitions defines the expected
@@ -1109,6 +1126,13 @@ for varname in templateData:
                 <t>
                     This is to guard against re-interpretation of "safe" data, similar to the
                     precautions for "targetSchema".
+                </t>
+                <t>
+                    The "targetSchema" keyword has similar security concerns to that of
+                    "targetMediaType".
+                    Clients MUST NOT use the value of this property to aid in the interpretation
+                    of the data received in response to following the link, as this leaves
+                    "safe" data open to re-interpretation.
                 </t>
             </section>
         </section>
@@ -1189,8 +1213,8 @@ for varname in templateData:
         <section title="JSON Hyper-Schema and HTTP" anchor="HTTP">
             <t>
                 While JSON Hyper-Schema is a hypermedia format and therefore protocol-independent,
-                its most common expected use is in HTTP systems, or systems using protocols
-                such as CoAP which are explicitly analogous to HTTP.
+                it is expected that its most common use will be in HTTP systems, or systems
+                using protocols such as CoAP that are explicitly analogous to HTTP.
             </t>
             <t>
                 This appendix provides guidance on how to define links for use with each
