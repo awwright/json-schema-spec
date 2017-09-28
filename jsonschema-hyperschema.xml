@@ -26,22 +26,22 @@
 <?rfc rfcedstyle="yes"?>
 <?rfc comments="yes"?>
 <?rfc inline="yes" ?>
-<rfc category="info" docName="draft-wright-json-schema-hyperschema-02" ipr="trust200902">
+<rfc category="info" docName="draft-andrews-json-schema-hyperschema-00" ipr="trust200902">
     <front>
         <title abbrev="JSON Hyper-Schema">
             JSON Hyper-Schema: A Vocabulary for Hypermedia Annotation of JSON
         </title>
 
-        <author fullname="Austin Wright" initials="A" surname="Wright" role="editor">
-            <address>
-                <email>aaa@bzfx.net</email>
-            </address>
-        </author>
-
         <author fullname="Henry Andrews" initials="H" surname="Andrews" role="editor">
             <organization>Cloudflare, Inc.</organization>
             <address>
                 <email>henry@cloudflare.com</email>
+            </address>
+        </author>
+
+        <author fullname="Austin Wright" initials="A" surname="Wright" role="editor">
+            <address>
+                <email>aaa@bzfx.net</email>
             </address>
         </author>
 
@@ -1537,9 +1537,28 @@ for varname in templateData:
             </t>
             <t>
                 <list style="hanging">
-                    <t hangText="draft-wright-json-schema-hyperschema-02">
+                    <t hangText="draft-andrews-json-schema-hyperschema-00">
                         <list style="symbols">
-                            <t></t>
+                            <t>Top to bottom reorganization and rewrite</t>
+                            <t>Group keywords per RFC 5988bis context/relation/target/target attributes</t>
+                            <t>Additional keyword groups for template resolution and describing input</t>
+                            <t>Added section on general implementation requirements</t>
+                            <t>Expanded overview to set context</t>
+                            <t>Consolidated security concerns in their own section</t>
+                            <t>Consolidated HTTP guidance in an appendix</t>
+                            <t>Added an appendix on usage in APIs</t>
+                            <t>Added an appendinx on static analysis of hyper-schemas</t>
+                            <t>Moved "readOnly" to the validation specification</t>
+                            <t>Moved "media" to validataion as "contentMediaType"/"contentEncoding"</t>
+                            <t>Renamed "submissionEncType" to "submissionMediaType"</t>
+                            <t>Renamed "mediaType" to "targetMediaType"</t>
+                            <t>Added "anchor" and "anchorPointer"</t>
+                            <t>Added "templatePointers" and "templateRequired"</t>
+                            <t>Clarified how "hrefSchema" is used</t>
+                            <t>Added "targetHints" and "headerSchema"</t>
+                            <t>Added guidance on "collection" and "item" link usage</t>
+                            <t>Added "description" as an LDO keyword</t>
+                            <t>Added "$comment" in LDOs to match the schema keyword</t>
                         </list>
                     </t>
                     <t hangText="draft-wright-json-schema-hyperschema-01">
