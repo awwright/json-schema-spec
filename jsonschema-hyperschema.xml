@@ -563,7 +563,7 @@
                     <xref target="hrefSchema">"hrefSchema"</xref>, this template can identify
                     a set of possible target resources to use based on client input.
                     The full process of resolvling the URI template, with or without client
-                    input, is covered in the <xref target="uriTemplating">URI Templating<xref>
+                    input, is covered in the <xref target="uriTemplating">URI Templating</xref>
                     section.
                 </t>
                 <section title="href" anchor="href">
@@ -695,7 +695,7 @@
                         the link target's representation.  Depending on the protocol,
                         the schema may or may not describe the request or response to
                         any particular operation performed with the link. See the
-                        <xref target="HTTP">JSON Hyper-Schema and HTTP<xref> section for
+                        <xref target="HTTP">JSON Hyper-Schema and HTTP</xref> section for
                         an in-depth discussion of how this keyword is used with HTTP.
                     </t>
                 </section>
