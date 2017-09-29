@@ -1160,7 +1160,7 @@
                     keywords.  Implementation of this feature MAY instead be done separately.
                 </t>
                 <t>
-                    Since many subschemas can be applicable to any single sub-isntance, each
+                    Since many subschemas can be applicable to any single sub-instance, each
                     annotation keyword or vocabulary needs to specify how to handle multiple
                     occurrences with different values.  In the absence of keyword-specific
                     handling rules, an implementation MUST collect all values and make them
