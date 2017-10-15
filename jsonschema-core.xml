@@ -47,12 +47,8 @@
         <abstract>
             <t>
                 JSON Schema defines the media type "application/schema+json", a JSON-based format
-                for describing the structure of JSON data.
-                JSON Schema asserts what a JSON document must look like,
-                ways to extract information from it,
-                and how to interact with it,
-                ideal for annotating existing JSON APIs that would not otherwise have hypermedia
-                controls or be machine-readable.
+                for annotating and evaluating assertions about JSON data.  JSON Schema supports
+                multiple vocabularies, several of which are standardized.
             </t>
         </abstract>
         <note title="Note to Readers">
@@ -73,23 +69,19 @@
     <middle>
         <section title="Introduction">
             <t>
-                JSON Schema is a JSON media type for defining the structure of JSON data. JSON Schema
-                is intended to define validation, documentation, hyperlink navigation, and interaction
-                control of JSON data.
+                JSON Schema is a JSON media type for working with JSON data.  Use cases include
+                describing and asserting the structure of JSON data, as well as annotating JSON
+                data with both general-purpose metadata and hypermedia links.
             </t>
             <t>
                 This specification defines JSON Schema core terminology and mechanisms, including
-                pointing to another JSON Schema by reference,
-                dereferencing a JSON Schema reference,
-                and specifying the vocabulary being used.
-            </t>
-            <t>
-                Other specifications define the vocabularies that perform assertions about validation,
-                linking, annotation, navigation, and interaction.
+                schema modularity using references, as well as general rules for attaching
+                annotations and evaluating assertions.  Specific annotation and assertion
+                vocabularies are defined in other related specifications.
             </t>
         </section>
 
-        <section title="Conventions and Terminology">
+        <section title="Notational Conventions">
             <t>
                 <!-- The text in this section has been copied from the official boilerplate,
                 and should not be modified.-->
@@ -98,14 +90,30 @@
                 "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be
                 interpreted as described in <xref target="RFC2119">RFC 2119</xref>.
             </t>
-
-            <t>
-                The terms "JSON", "JSON text", "JSON value", "member", "element", "object", "array",
-                "number", "string", "boolean", "true", "false", and "null" in this document are to
-                be interpreted as defined in <xref target="RFC7159">RFC 7159</xref>.
-            </t>
         </section>
 
+        <section title="Overview">
+            <section title="Terminology">
+            </section>
+        </section>
+        <section title="Scheme functionality">
+            <section title="Annotation / Applicability">
+            </section>
+            <section title="Assertion / Validity">
+            </section>
+        </section>
+        <section title="Data model">
+            <section title="Primitive types">
+            </section>
+            <section title="Array Keywords">
+            </section>
+            <section title="Object Keywords">
+            </section>
+            <section title="Combinatoric Keywords">
+            </section>
+            <section title="Conditionals">
+            </section>
+        </section>
         <section title="Overview">
             <t>
                 This document proposes a new media type "application/schema+json" to identify a JSON
@@ -115,69 +123,115 @@
                 data in several ways.
             </t>
 
-            <section title="Validation">
+            <section title="Terminology">
                 <t>
-                    JSON Schema describes the structure of a JSON document (for instance, required
-                    properties and length limitations).
-                    Applications can use this information to validate instances (check that
-                    constraints are met), or inform interfaces to collect user input such that the
-                    constraints are satisfied.
+                    The terms "JSON", "JSON text", "JSON value", "member", "element", "object",
+                    "array", "number", "string", "boolean", "true", "false", and "null" in this
+                    document are to be interpreted as defined in
+                    <xref target="RFC7159">RFC 7159</xref>.
+                </t>
+
+                <t>
+                    <list style="hanging">
+                        <t hangText="annotation">
+                            a
+                        </t>
+                        <t hangText="assertion">
+                            a
+                        </t>
+                        <t hangText="applicable">
+                            a
+                        </t>
+                        <t hangText="JSON document">
+                            A JSON document is an information resource (series of octets) described
+                            by the application/json media type.  In JSON Schema, the terms
+                            "JSON document", "JSON text", and "JSON value" are interchangeable
+                            because of the data model it defines.
+                        </t>
+                        <t hangText="location">
+                            A location in a JSON document can be expressed as a JSON Pointer.
+                            Locations within schema documents are associated in various ways
+                            with locations in instance documents. [TODO: BETTER LANGUAGE]
+                        </t>
+                        <t hangText="instance">
+                            JSON Schema interprets documents according to a data model. A value
+                            interpreted according to this data model is called an "instance".
+                            While JSON Schema is only defined over JSON documents, an instance
+                            can be any document or memory structure that can be parsed into or
+                            processed according to the JSON Schema data model, including media
+                            types such as <xref target="RFC7049">CBOR</xref>.
+                        </t>
+                        <t hangText="schema document">
+                            A JSON Schema document is a JSON document that is applied to an
+                            instance as described by this specification.
+                            A schema document itself can also be interpreted as an instance.
+                        </t>
+                        <t hangText="schema, root schema, and subschemas">
+                            A JSON Schema MUST be an object or a boolean.  The schema at the
+                            top level of a JSON Schema document is known as the root schema,
+                            while schemas nested beneath keywords are known as subschemas.
+                        </t>
+                    </list>
+                </t>
+
+                <t>
+                    Boolean values are equivalent to the following behaviors:
+                    <list style="hanging">
+                        <t hangText="true">Always passes validation, as if the empty schema {}</t>
+                        <t hangText="false">Always fails validation, as if the schema { "not":{} }</t>
+                    </list>
+                </t>
+
+
+                <t>
+                    Properties that are used to describe the instance are called keywords, or schema
+                    keywords.
+                    The meaning of properties is specified by the vocabulary that the schema is using.
                 </t>
                 <t>
-                    Validation behaviour and keywords are specified in
-                    <xref target="json-schema-validation">a separate document</xref>.
+                    A JSON Schema MAY contain properties which are not schema keywords.
+                    Unknown keywords SHOULD be ignored.
+                </t>
+                <t>
+                    A schema that itself describes a schema is called a meta-schema.
+                    Meta-schemas are used to validate JSON Schemas and specify which vocabulary it
+                    is using.
+                </t>
+                <t>
+                    An empty schema is a JSON Schema with no properties, or only unknown properties.
                 </t>
             </section>
 
-            <section title="Hypermedia and Linking">
-                <t>
-                    JSON Hyper-Schema describes the hypertext structure of a JSON document.
-                    This includes link relations from the instance to other resources,
-                    interpretation of instances as multimedia data, and submission data required to
-                    use an API.
-                </t>
-                <t>
-                    Hyper-schema behaviour and keywords are specified in
-                    <xref target="json-hyper-schema">a separate document</xref>.
-                </t>
-            </section>
-        </section>
 
-        <section title="Definitions">
-
-            <section title="JSON Document">
-                <t>
-                    A JSON document is an information resource (series of octets) described by the
-                    application/json media type.
-                </t>
-                <t>
-                    In JSON Schema, the terms "JSON document", "JSON text", and "JSON value" are
-                    interchangeable because of the data model it defines.
-                </t>
-                <t>
-                    JSON Schema is only defined over JSON documents. However, any document or memory
-                    structure that can be parsed into or processed according to the JSON Schema data
-                    model can be interpreted against a JSON Schema, including media types like
-                    <xref target="RFC7049">CBOR</xref>.
-                </t>
-            </section>
-
-            <section title="Instance">
-                <t>
-                    JSON Schema interprets documents according to a data model. A JSON value
-                    interpreted according to this data model is called an "instance".
-                </t>
+            <section title="Data Model">
+<t>
+Keywords in this section are defined in terms of how they apply one or more subschemas to an instance, and how the results of assertions in those subschemas are processed.
+</t>
                 <t>
                     An instance has one of six primitive types, and a range of possible values
                     depending on the type:
 
                     <list style="hanging">
-                        <t hangText="null">A JSON "null" production</t>
-                        <t hangText="boolean">A "true" or "false" value, from the JSON "true" or "false" productions</t>
-                        <t hangText="object">An unordered set of properties mapping a string to an instance, from the JSON "object" production</t>
-                        <t hangText="array">An ordered list of instances, from the JSON "array" production</t>
-                        <t hangText="number">An arbitrary-precision, base-10 decimal number value, from the JSON "number" production</t>
-                        <t hangText="string">A string of Unicode code points, from the JSON "string" production</t>
+                        <t hangText="null">
+                            A JSON "null" production
+                        </t>
+                        <t hangText="boolean">
+                            A "true" or "false" value, from the JSON "true" or "false" productions
+                        </t>
+                        <t hangText="object">
+                            An unordered set of properties mapping a string to an instance, from
+                            the JSON "object" production
+                        </t>
+                        <t hangText="array">
+                            An ordered list of instances, from the JSON "array" production
+                        </t>
+                        <t hangText="number">
+                            An arbitrary-precision, base-10 decimal number value, from the JSON
+                            "number" production
+                        </t>
+                        <t hangText="string">
+                            A string of Unicode code points, from the JSON "string" production
+                        </t>
                     </list>
                 </t>
                 <t>
@@ -858,6 +912,36 @@ User-Agent: product-name/5.4.1 so-cool-json-schema/1.0.2 curl/7.43.0
                 <seriesInfo name="Internet-Draft" value="draft-wright-json-schema-hyperschema-00" />
             </reference>
         </references>
+
+        <section title="Standardized vocabularies">
+            <t><cref>TODO: Update, expand, provide some context, etc.</cref></t>
+            <section title="Validation">
+                <t>
+                    JSON Schema describes the structure of a JSON document (for instance, required
+                    properties and length limitations).
+                    Applications can use this information to validate instances (check that
+                    constraints are met), or inform interfaces to collect user input such that the
+                    constraints are satisfied.
+                </t>
+                <t>
+                    Validation behaviour and keywords are specified in
+                    <xref target="json-schema-validation">a separate document</xref>.
+                </t>
+            </section>
+
+            <section title="Hypermedia and Linking">
+                <t>
+                    JSON Hyper-Schema describes the hypertext structure of a JSON document.
+                    This includes link relations from the instance to other resources,
+                    interpretation of instances as multimedia data, and submission data required to
+                    use an API.
+                </t>
+                <t>
+                    Hyper-schema behaviour and keywords are specified in
+                    <xref target="json-hyper-schema">a separate document</xref>.
+                </t>
+            </section>
+        </section>
 
         <section title="Acknowledgments">
             <t>
