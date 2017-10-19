@@ -1294,17 +1294,85 @@ for varname in templateData:
                 using protocols such as CoAP that are explicitly analogous to HTTP.
             </t>
             <t>
-                This appendix provides guidance on how to define links for use with each
-                common HTTP method, and how collection resources impose additional constraints
-                on the use of HTTP POST.  Additionally, guidance is provided on hinting at
-                HTTP response header values and describing possible HTTP request headers
-                that are relevant to the given resource.
+                This section provides guidance on how to define links that support operations
+                using all common HTTP methods, and how collection links impose additional
+                constraints on the use of HTTP POST.  Additionally, guidance is provided on
+                hinting at HTTP response header values and describing possible HTTP request
+                headers that are relevant to the given resource.
             </t>
-            <section title="One link per target and relation type">
+            <t>
+                This led to a great deal of misplaced concern when "method" was removed
+                from Hyper-Schema.  An API that fully conforms to HTTP's method semantics
+                does not need describing at the individual method request and response
+                level.  Requests are straightforward:
+                <list style="hanging">
+                    <t hangText="HEAD:">No request payload</t>
+                    <t hangText="GET:">No request payload</t>
+                    <t hangText="PUT:">"targetSchema" and "targetMediaType"</t>
+                    <t hangText="PATCH:">
+                        "targetSchema", "targetMediaType", and "accept-patch" in "targetHints"
+                    </t>
+                    <t hangText="POST:">
+                        "submissionSchema", "submissionMediaType", and optionally "accept-post"
+                        in "targetHints"
+                    </t>
+                    <t hangText="DELETE:">No request payload</t>
+                </list>
+                All methods make use of "hrefSchema" to accept input to use in constructing
+                the target URI.  While HTML only supports such functionality with GET requests,
+                URI construction from input is orthogonal to the choice of method.
+            </t>
+            <t>
+                As a hypermedia format rather than an API description system, hyper-schema
+                is not directly concerned with specifying request and response structures
+                for each operation on each link.  Instead, the "targetSchema" and
+                "targetMediaType" keywords describe the target resource's representation,
+                and most request and response structures can be inferred from it.
+                PATCH additionally requires an indication of the patch media type,
+                which is provided through the "targetHints" keyword.
+            </t>
+            <t>
+                Requests:
+                    HEAD: No payload
+                    GET: No payload
+                    PUT: targetSchema, targetMediaType
+                    PATCH: targetSchema, targetMediaType, targetHints.accept-patch
+                    DELETE: No payload
+                    POST: submissionSchema, submissionMediaType, targetHints.accept-post
+                    OPTIONS: No payload
+                Responses:
+                    The response's own schema link is authoritative, however, two
+                    situations are predictable:
+                    GET: targetSchema, targetMediaType
+                    Content-Location == request URI: targetSchema, targetMediaType
+            </t>
+            <t>
+                Because HTTP's POST does not have consistently defined syntax or
+                semantics, the "submissionSchema" and "submissionMediaType" keywords
+                are used to describe POST request payloads.  Since POST is the only
+                HTTP method with this issue, the "submission" keywords
+            </t>
+            <t>
+                There are three things to understand about a link: it's semantics, its
+                operational syntax, and the set of operations it supports.
+                <list>
+                    <t>Describing operation semantics</t>
+                    <t>Describing operation syntax</t>
+                    <t>Describing operation support</t>
+                </list>
+            </t>
+            <section title="One link for all operations per target and relation type">
                 <t>
-                    Link Description Objects do not directly indicate what operations, such
-                    as HTTP methods, are supported by the target resource.  Instead, operations
-                    should be inferred primarily from link <xref target="rel">relation types</xref>
+                    Recall that a particular use of a link, such as making an HTTP request with
+                    a specific method, is referred to as an operation.  Each link can potentially
+                    support multiple operations.  In particular, all common HTTP operations on
+                    a resource that respects HTTP method semantics can be expressed with a single
+                    link.
+                </t>
+                <t>
+                    Link Description Objects do not directly indicate what operations are
+                    supported by the target resource.  Instead, operations should be inferred
+                    primarily from link <xref target="rel">relation types</xref>
                     and URI schemes.
                 </t>
                 <t>
