@@ -1815,6 +1815,75 @@ Link: <https://schema.example.com/entry> rel=describedBy
                 <t><cref>
                     "base" used as a template with both "anchor" and "href" templates.
                 </cref></t>
+                <figure>
+                    <artwork>
+<![CDATA[{
+    "base": "stars/{starId}/",
+    "properties": {
+        "id": {"type": "string"},
+        "star": {
+            "properties": {"id": {"type": "string"}}
+        },
+        "primary": {
+            "properties": {"id": {"type": "string"}}
+        },
+        "coOrbitals": {
+            "type": "array",
+            "items": {
+                "properties": {"id": {"type": "string"}},
+                "links": [
+                    {
+                        "rel": "self",
+                        "href": "planets/{planetId}/satellite/{id}"
+                    },
+                    {
+                        "anchor": "..",
+                        "rel": "tag:example.com,2017:satellite",
+                        "href": "satellite/{id}"
+                    }
+                ]
+            }
+        }
+    },
+    "links": [
+        {
+            "rel": "self",
+            "href": "planets/{planetId}/satellites/{id}",
+            "templatePointers": {
+                "starId": "/star/id",
+                "planetId": "/primary/id"
+            }
+        },
+        {
+            "rel": "primary",
+            "href": "planets/{planetId}",
+            "templatePointers": {
+                "starId": "/star/id",
+                "planetId": "/primary/id"
+            }
+        }
+    ]
+}]]>
+
+<![CDATA[{
+    "properties": {
+        "id": {"type": "string"},
+        "children": {
+            "type": "object",
+            "additionalProperties": {
+                "type": "object",
+                "properties": {
+                    "id": {"type": "string"}
+                },
+                "links": [
+                    {"rel": "up", "href": ".."},
+                    {"rel": "sibling"
+            }
+        }
+    }
+}]]>
+                    </artwork>
+                </figure>
             </section>
             <section title="Collections">
                 <t><cref>
