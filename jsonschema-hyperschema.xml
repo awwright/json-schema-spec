@@ -1817,142 +1817,102 @@ Link: <https://schema.example.com/entry> rel=describedBy
                 </cref></t>
                 <figure>
                     <artwork>
+
 <![CDATA[{
-    "base": "stars/{starId}/",
-    "properties": {
-        "id": {"type": "string"},
-        "star": {
-            "properties": {"id": {"type": "string"}}
-        },
-        "primary": {
-            "properties": {"id": {"type": "string"}}
-        },
-        "coOrbitals": {
-            "type": "array",
-            "items": {
-                "properties": {"id": {"type": "string"}},
-                "links": [
-                    {
-                        "rel": "self",
-                        "href": "planets/{planetId}/satellite/{id}"
-                    },
-                    {
-                        "rel": "tag:example.com,2017:primary",
-                        "href": "..",
-                        "templatePointers": {
-                            "starId": "/star/id",
-                            "planetId": "/primary/id"
-                        }
-                    },
-                    {
-                        "anchor": "..",
-                        "rel": "tag:example.com,2017:satellite",
-                        "href": "satellite/{id}",
-                        "templatePointers": {
-                            "starId": "/star/id",
-                            "planetId": "/primary/id"
-                        }
-                    }
-                ]
-            }
-        }
-    },
-    "links": [
-        {
-            "rel": "self",
-            "href": "planets/{planetId}/satellites/{id}",
-            "templatePointers": {
-                "starId": "/star/id",
-                "planetId": "/primary/id"
-            }
-        },
-        {
-            "rel": "tag:example.com,2017:primary",
-            "href": "planets/{planetId}",
-            "templatePointers": {
-                "starId": "/star/id",
-                "planetId": "/primary/id"
-            }
-        },
-        {
-            "anchor": "planets/{planetId}",
-            "rel": "tag:example.com,2017:satellite",
-            "href": "planets/{planetId}/satellites/{id}",
-            "templatePointers": {
-                "starId": "/star/id",
-                "planetId": "/primary/id"
-            }
-        }
-    ]
+    "base": "https://api.example.com/",
+    "allOf": [{"$ref": "star"}]
 }]]>
 
 <![CDATA[{
-    "type": "object",
-    "base": "stars/{id}/",
-    "properties": {
-        "id": {"$ref": "#/definitions/id"},
-        "planets": {
-            "additionalProperties": {
-                "type": "object",
-                "properties": {
-                    "id": {"$ref": "#/definitions/id"},
-                    "moons": {
-                        "additionalProperties": {
-                            "type": "object",
-                            "properties": {
-                                "id": {"$ref": "#/definitions/id"}
-                            },
-                            "links": [
-                                {
-                                    "rel": "self",
-                                    "href": "planets/{planetId}/moons/{moonId}",
-                                    "templatePointers": {
-                                        "id": "/id",
-                                        "planetId": "2/id",
-                                        "moonId": "0/id"
-                                    }
-                                },
-                                {
-                                    "anchor": "planets/{planetId}",
-                                    "rel": "tag:example.com,2017:moon",
-                                    "href": "planets/{planetId}/moons/{moonId}",
-                                    "templatePointers": {
-                                        "id": "/id",
-                                        "planetId": "2/id",
-                                        "moonId": "0/id"
-                                    }
-                                }
-                            ]
-                        }
-                    }
-                },
-                "links": [
-                    {
-                        "rel": "self",
-                        "href": "planets/{planetId"},
-                        "templatePointers": {
-                            "id": "/id",
-                            "planetId": "0/id"
-                        }
-                    },
-                    {
-                        "rel": "tag:example.com,2017:planet",
-                        "href": "planets/{planetId}"
-                    }
-                ]
-            }
-        }
-    },
-    "links": [
-        {
-            "rel": "self",
-            "href": ".."
-        }
-    ],
+    "base": "https://api.example.com/",
+    "allOf": [{"$ref": "planet"}]
+}]]>
+
+<![CDATA[{
+    "base": "https://api.example.com/",
+    "allOf": [{"$ref": "moon"}]
+}]]>
+
+<![CDATA[{
     "definitions": {
         "id": {
             "type": "integer",
             "minimum": 1
+        },
+        "moon": {
+            "type": "object",
+            "properties": {
+                "id": {"$ref": "#/definitions/id"},
+                "planetId": {"$ref": "#definitions/id"},
+                "starId": {"$ref": "#definitions/id"}
+            },
+            "links": [
+                {
+                    "rel": "self",
+                    "href": "planets/{planetId}/moons/{moonId}",
+                    "templatePointers": {
+                        "id": "/id",
+                        "planetId": "2/id",
+                        "moonId": "0/id"
+                    }
+                },
+                {
+                    "anchor": "planets/{planetId}",
+                    "rel": "tag:example.com,2017:moon",
+                    "href": "planets/{planetId}/moons/{moonId}",
+                    "templatePointers": {
+                        "id": "/id",
+                        "planetId": "2/id",
+                        "moonId": "0/id"
+                    }
+                }
+            ]
+        },
+        "planet": {
+            "type": "object",
+            "properties": {
+                "id": {"$ref": "#/definitions/id"},
+                "starId": {"$ref": "#definitions/id"},
+                "moons": {
+                    "base": "planets/{planetId}",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/moon"
+                    }
+                }
+            },
+            "links": [
+                {
+                    "rel": "self",
+                    "href": "planets/{id"},
+                    "templatePointers": {
+                        "id": "/id",
+                        "planetId": "0/id"
+                    }
+                },
+                {
+                    "rel": "tag:example.com,2017:planet",
+                    "href": "planets/{planetId}"
+                }
+            ]
+        },
+        "star": {
+            "type": "object",
+            "properties": {
+                "id": {"$ref": "#/definitions/id"},
+                "planets": {
+                    "base": "stars/{starId}",
+                    "items": {
+                        "$ref": "#/definitions/planet"
+                    }
+                }
+            },
+            "links": [
+                {
+                    "rel": "self",
+                    "href": "stars/{id}"
+                }
+            ]
         }
     }
 }]]>
