@@ -1819,21 +1819,42 @@ Link: <https://schema.example.com/entry> rel=describedBy
                     <artwork>
 
 <![CDATA[{
+    "$id": "https://schema/example.com/star",
+    "$schema": "http://json-schema.org/draft-07-wip/hyper-schema#",
     "base": "https://api.example.com/",
-    "allOf": [{"$ref": "star"}]
+    "allOf": [{"$ref": "astro#/definitions/star"}]
 }]]>
 
-<![CDATA[{
-    "base": "https://api.example.com/",
-    "allOf": [{"$ref": "planet"}]
-}]]>
+Star self link:     "https://api.example.com/stars/1"
+Planet self link:   "https://api.example.com/stars/1/planets/3"
+Moon self link:     "https://api.example.com/stars/1/planets/3/moons/1"
 
 <![CDATA[{
+    "$id": "https://schema/example.com/planet",
+    "$schema": "http://json-schema.org/draft-07-wip/hyper-schema#",
     "base": "https://api.example.com/",
-    "allOf": [{"$ref": "moon"}]
+    "allOf": [{"$ref": "astro#/definitions/planet"}]
 }]]>
 
+Planet "self" link: "https://api.example.com/planets/3"
+Moon "self" link:   "https://api.example.com/planets/3/moons/1"
+"primary" link:     "https://api.example.com/planets/3/moons/1" to "https://api.example.com/planets/3"
+
 <![CDATA[{
+    "$id": "https://schema/example.com/moon",
+    "$schema": "http://json-schema.org/draft-07-wip/hyper-schema#",
+    "base": "https://api.example.com/",
+    "allOf": [{"$ref": "astro#/definitions/moon"}]
+}]]>
+
+Moon "self" link:   "https://api.example.com/moons/1"
+"satellite" link:   "https://api.example.com/planets/3" -> "https://example.com/moons/1"
+"primary"   link:   "https://api.example.com/planets/3" -> "https://example.com/starts/1"
+"primary"   link:   "https://api.example.com/moons/1" -. "https://api.example.com/planets/3"
+
+<![CDATA[{
+    "$id": "https://schema/example.com/astro",
+    "$schema": "http://json-schema.org/draft-07-wip/hyper-schema#",
     "definitions": {
         "id": {
             "type": "integer",
@@ -1843,15 +1864,13 @@ Link: <https://schema.example.com/entry> rel=describedBy
             "type": "object",
             "properties": {
                 "id": {"$ref": "#/definitions/id"},
-                "planetId": {"$ref": "#definitions/id"},
-                "starId": {"$ref": "#definitions/id"}
+                "planetId": {"$ref": "#definitions/id"}
             },
             "links": [
                 {
                     "rel": "self",
                     "href": "planets/{planetId}/moons/{moonId}",
                     "templatePointers": {
-                        "id": "/id",
                         "planetId": "2/id",
                         "moonId": "0/id"
                     }
@@ -1861,7 +1880,6 @@ Link: <https://schema.example.com/entry> rel=describedBy
                     "rel": "tag:example.com,2017:moon",
                     "href": "planets/{planetId}/moons/{moonId}",
                     "templatePointers": {
-                        "id": "/id",
                         "planetId": "2/id",
                         "moonId": "0/id"
                     }
@@ -1872,12 +1890,23 @@ Link: <https://schema.example.com/entry> rel=describedBy
             "type": "object",
             "properties": {
                 "id": {"$ref": "#/definitions/id"},
-                "starId": {"$ref": "#definitions/id"},
+                "systemId": {"$ref": "#definitions/id"},
                 "moons": {
                     "base": "planets/{planetId}",
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/moon"
+                        "allOf": {"$ref": "#/definitions/moon"},
+                        "links": [
+                            {
+                                "anchor": "moons/{moonId}",
+                                "rel": "tag:example.com,2017:system",
+                                "href": "systems/{systemId}",
+                                "templatePointers": {
+                                    "moonId": "0/id",
+                                    "systemId": "/systemId"
+                                }
+                            }
+                        ]
                     }
                 }
             },
