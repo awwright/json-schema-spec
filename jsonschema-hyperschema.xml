@@ -1837,9 +1837,21 @@ Link: <https://schema.example.com/entry> rel=describedBy
                         "href": "planets/{planetId}/satellite/{id}"
                     },
                     {
+                        "rel": "tag:example.com,2017:primary",
+                        "href": "..",
+                        "templatePointers": {
+                            "starId": "/star/id",
+                            "planetId": "/primary/id"
+                        }
+                    },
+                    {
                         "anchor": "..",
                         "rel": "tag:example.com,2017:satellite",
-                        "href": "satellite/{id}"
+                        "href": "satellite/{id}",
+                        "templatePointers": {
+                            "starId": "/star/id",
+                            "planetId": "/primary/id"
+                        }
                     }
                 ]
             }
@@ -1855,8 +1867,17 @@ Link: <https://schema.example.com/entry> rel=describedBy
             }
         },
         {
-            "rel": "primary",
+            "rel": "tag:example.com,2017:primary",
             "href": "planets/{planetId}",
+            "templatePointers": {
+                "starId": "/star/id",
+                "planetId": "/primary/id"
+            }
+        },
+        {
+            "anchor": "planets/{planetId}",
+            "rel": "tag:example.com,2017:satellite",
+            "href": "planets/{planetId}/satellites/{id}",
             "templatePointers": {
                 "starId": "/star/id",
                 "planetId": "/primary/id"
@@ -1866,22 +1887,134 @@ Link: <https://schema.example.com/entry> rel=describedBy
 }]]>
 
 <![CDATA[{
+    "type": "object",
+    "base": "stars/{id}/",
     "properties": {
-        "id": {"type": "string"},
-        "children": {
-            "type": "object",
+        "id": {"$ref": "#/definitions/id"},
+        "planets": {
             "additionalProperties": {
                 "type": "object",
                 "properties": {
-                    "id": {"type": "string"}
+                    "id": {"$ref": "#/definitions/id"},
+                    "moons": {
+                        "additionalProperties": {
+                            "type": "object",
+                            "properties": {
+                                "id": {"$ref": "#/definitions/id"}
+                            },
+                            "links": [
+                                {
+                                    "rel": "self",
+                                    "href": "planets/{planetId}/moons/{moonId}",
+                                    "templatePointers": {
+                                        "id": "/id",
+                                        "planetId": "2/id",
+                                        "moonId": "0/id"
+                                    }
+                                },
+                                {
+                                    "anchor": "planets/{planetId}",
+                                    "rel": "tag:example.com,2017:moon",
+                                    "href": "planets/{planetId}/moons/{moonId}",
+                                    "templatePointers": {
+                                        "id": "/id",
+                                        "planetId": "2/id",
+                                        "moonId": "0/id"
+                                    }
+                                }
+                            ]
+                        }
+                    }
                 },
                 "links": [
-                    {"rel": "up", "href": ".."},
-                    {"rel": "sibling"
+                    {
+                        "rel": "self",
+                        "href": "planets/{planetId"},
+                        "templatePointers": {
+                            "id": "/id",
+                            "planetId": "0/id"
+                        }
+                    },
+                    {
+                        "rel": "tag:example.com,2017:planet",
+                        "href": "planets/{planetId}"
+                    }
+                ]
+            }
+        }
+    },
+    "links": [
+        {
+            "rel": "self",
+            "href": ".."
+        }
+    ],
+    "definitions": {
+        "id": {
+            "type": "integer",
+            "minimum": 1
+        }
+    }
+}]]>
+
+
+<![CDATA[{
+    "id": 1,
+    "planets": {
+        "Mars": {
+            "id": 40,
+            "moons": {
+                "Phobos": {"id": 100},
+                "Deimos": {"id": 200}
             }
         }
     }
 }]]>
+
+<![CDATA[[
+    {
+        "contextUri": "https://api.example.com/stars/1",
+        "contextPointer": "",
+        "rel": "self",
+        "targetUri": "https://api.example.com/stars/1",
+        "attachmentPointer": ""
+    },
+    {
+        "contextUri": "https://api.example.com/stars/1#/planets/Mars",
+        "contextPointer": "/planets/Mars",
+        "rel": "self",
+        "targetUri": "https://api.example.com/stars/1/planets/40",
+        "attachmentPointer": "/planets/Mars"
+    },
+    {
+        "contextUri": "https://api.example.com/stars/1/planets/40",
+        "contextPointer": "",
+        "rel": "tag:example.com,2016:primary",
+        "targetUri": "https://api.example.com/stars/1",
+        "attachmentPointer": "/planets/Mars"
+    },
+    {
+        "contextUri": "https://api.example.com/stars/1",
+        "contextPointer": "",
+        "rel": "tag:example.com,2016:planet",
+        "targetUri": "https://api.example.com/stars/1/planets/40",
+        "attachmentPointer": "/planets/Mars"
+    },
+    {
+        "contextUri": "https://api.example.com/stars/1#/planets/Mars/moons/Phobos",
+        "contextPointer": "/planets/Mars/moons/Phobos",
+        "rel": "self",
+        "targetUri": "https://api.example.com/stars/1/planets/40/moons/100",
+        "attachmentPointer": "/planets/Mars/moons/Phobos"
+    },
+    {
+        "contextUri": "https://api.example.com/stars/1/planets/40",
+        "contextPointer": "",
+        "rel": "tag:example.com,2017:moon",
+        "targetUri": "https://api.example.com/stars/1/planets/40/moons/100",
+        "attachmentPointer": "/planets/Mars/moons/Phobos"
+    }
+]]]>
                     </artwork>
                 </figure>
             </section>
