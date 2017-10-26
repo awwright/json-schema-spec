@@ -1853,6 +1853,52 @@ Moon "self" link:   "https://api.example.com/moons/1"
 "primary"   link:   "https://api.example.com/moons/1" -. "https://api.example.com/planets/3"
 
 <![CDATA[{
+    "properties": {
+        "id": {},
+        "nodes": {
+            "items": {"$ref": "#/definitions/node"}
+        }
+}]]>
+
+<![CDATA[{
+    "properties": {
+        "id": {},
+        "owners": {
+            "items": {}
+        },
+        "drivers": {
+            "items": {}
+        }
+    }
+}]]>
+driver - insurance holder - owner - relatinships btwn driver and owner?
+Ugh, how to express that the relationshi is present?
+
+<![CDATA[{
+    "definitions": {
+        "thing": {
+            "properties": {
+                "id": {"$ref": "#/definitions/id"}
+            }
+        },
+        "user": {
+{
+    "properties": {
+        "id": {"$ref": "#/definitions/id"},
+        "admin": {"type": "boolean"}
+    },
+    "links": [
+        {
+            "rel": "self",
+            "href": "{id}"
+        }
+    ]
+}
+
+    }
+}]]>
+
+<![CDATA[{
     "$id": "https://schema/example.com/astro",
     "$schema": "http://json-schema.org/draft-07-wip/hyper-schema#",
     "definitions": {
@@ -1892,10 +1938,12 @@ Moon "self" link:   "https://api.example.com/moons/1"
                 "id": {"$ref": "#/definitions/id"},
                 "systemId": {"$ref": "#definitions/id"},
                 "moons": {
-                    "base": "planets/{planetId}",
                     "type": "array",
                     "items": {
-                        "allOf": {"$ref": "#/definitions/moon"},
+                        "allOf": [{
+                            "base": "planets/{planetId}",
+                            "allOf": [{"$ref": "#/definitions/moon"}]
+                        }],
                         "links": [
                             {
                                 "anchor": "moons/{moonId}",
@@ -1922,24 +1970,6 @@ Moon "self" link:   "https://api.example.com/moons/1"
                 {
                     "rel": "tag:example.com,2017:planet",
                     "href": "planets/{planetId}"
-                }
-            ]
-        },
-        "star": {
-            "type": "object",
-            "properties": {
-                "id": {"$ref": "#/definitions/id"},
-                "planets": {
-                    "base": "stars/{starId}",
-                    "items": {
-                        "$ref": "#/definitions/planet"
-                    }
-                }
-            },
-            "links": [
-                {
-                    "rel": "self",
-                    "href": "stars/{id}"
                 }
             ]
         }
