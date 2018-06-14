@@ -1,0 +1,68 @@
+{
+    "$schema": "http://json-schema.org/draft-08/hyper-schema#",
+    "$id": "http://json-schema.org/draft-08/links#",
+    "title": "Link Description Object",
+    "type": "object",
+    "properties": {
+        "anchor": {
+            "type": "string",
+            "format": "uri-template"
+        },
+        "anchorPointer": {
+            "type": "string",
+            "anyOf": [
+                { "format": "json-pointer" },
+                { "format": "relative-json-pointer" }
+            ]
+        },
+        "rel": {
+            "type": "string"
+        },
+        "href": {
+            "type": "string",
+            "format": "uri-template"
+        },
+        "hrefSchema": {
+        },
+        "templatePointers": {
+            "type": "object",
+            "additionalProperties": {
+                "type": "string",
+                "anyOf": [
+                    { "format": "json-pointer" },
+                    { "format": "relative-json-pointer" }
+                ]
+            }
+        },
+        "templateRequired": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            },
+            "uniqueItems": true
+        },
+        "title": {
+            "type": "string"
+        },
+        "description": {
+            "type": "string"
+        },
+        "targetSchema": {
+        },
+        "targetMediaType": {
+            "type": "string"
+        },
+        "targetHints": { },
+        "headerSchema": {
+        },
+        "submissionMediaType": {
+            "type": "string",
+            "default": "application/json"
+        },
+        "submissionSchema": {
+        },
+        "$comment": {
+            "type": "string"
+        }
+    }
+}

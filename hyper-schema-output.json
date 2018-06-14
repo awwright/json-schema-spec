@@ -3,10 +3,7 @@
     "$schema": "http://json-schema.org/draft-08/schema#",
     "type": "array",
     "items": {
-        "allOf": [
-            {"$ref": "http://json-schema.org/draft-08/links#/$defs/noRequiredFields" }
-        ],
-        "type": "object",
+        "$ref": "http://json-schema.org/draft-08/links#/$defs/noRequiredFields",
         "required": [
             "contextUri",
             "contextPointer",

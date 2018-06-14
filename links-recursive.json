@@ -1,6 +1,6 @@
 {
     "$schema": "http://json-schema.org/draft-08/hyper-schema#",
-    "$id": "http://json-schema.org/draft-08/links#",
+    "$id": "http://json-schema.org/draft-08/links-recursive#",
     "title": "Link Description Object",
     "required": [ "rel", "href" ],
     "$ref": "#/$defs/noRequiredFields",
@@ -9,16 +9,16 @@
             "$ref": "http://json-schema.org/draft-08/links-common#",
             "properties": {
                 "hrefSchema": {
-                    "$ref": "http://json-schema.org/draft-08/hyper-schema#"
+                    "$recurse": true
                 },
                 "targetSchema": {
-                    "$ref": "http://json-schema.org/draft-08/hyper-schema#"
+                    "$recurse": true
                 },
                 "headerSchema": {
-                    "$ref": "http://json-schema.org/draft-08/hyper-schema#"
+                    "$recurse": true
                 },
                 "submissionSchema": {
-                    "$ref": "http://json-schema.org/draft-08/hyper-schema#"
+                    "$recurse": true
                 }
             }
         }

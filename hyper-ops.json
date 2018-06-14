@@ -1,0 +1,29 @@
+{
+    "$comment": "THIS IS JUST TO DEMO MORE $recurse STUFF, IT IS NOT A PROPOSAL!",
+    "$schema": "http://json-schema.org/draft-08/hyper-ops#",
+    "$id": "http://json-schema.org/draft-08/hyper-schema#",
+    "title": "JSON Hypermedia Operations (Random demo version, do not take seriously)",
+    "$recursiveRef": "http://json-schema.org/draft-08/hyper-schema#",
+    "properties": {
+        "links": {
+            "items": {
+                "properties": {
+                    "operations": {
+                        "type": "array",
+                        "items": {
+                            "properties": {
+                                "someKindaSchema": {"$recurse": true}
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "links": [
+        {
+            "rel": "self",
+            "href": "{+%24id}"
+        }
+    ]
+}
