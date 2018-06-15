@@ -1,6 +1,7 @@
 {
     "$schema": "http://json-schema.org/draft-08/hyper-schema#",
     "$id": "http://json-schema.org/draft-08/links#",
+
     "title": "Link Description Object",
     "type": "object",
     "properties": {
@@ -22,8 +23,7 @@
             "type": "string",
             "format": "uri-template"
         },
-        "hrefSchema": {
-        },
+        "hrefSchema": true,
         "templatePointers": {
             "type": "object",
             "additionalProperties": {
@@ -47,20 +47,17 @@
         "description": {
             "type": "string"
         },
-        "targetSchema": {
-        },
+        "targetSchema": true,
         "targetMediaType": {
             "type": "string"
         },
         "targetHints": { },
-        "headerSchema": {
-        },
+        "headerSchema": true,
         "submissionMediaType": {
             "type": "string",
             "default": "application/json"
         },
-        "submissionSchema": {
-        },
+        "submissionSchema": true,
         "$comment": {
             "type": "string"
         }

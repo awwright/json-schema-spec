@@ -1,13 +1,15 @@
 {
     "$schema": "http://json-schema.org/draft-08/hyper-schema#",
     "$id": "http://json-schema.org/draft-08/hyper-schema#",
+    "$recursionAnchor": true,
+
     "title": "JSON Hyper-Schema",
-    "$recursiveRef": "http://json-schema.org/draft-08/schema#",
+    "$ref": "http://json-schema.org/draft-08/schema#",
     "properties": {
         "links": {
             "type": "array",
             "items": {
-                "$recursiveRef": "http://json-schema.org/draft-08/links-recursive#"
+                "$ref": "http://json-schema.org/draft-08/links#"
             }
         }
     },
