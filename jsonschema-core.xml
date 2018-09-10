@@ -575,8 +575,9 @@
                         As noted in <xref target="applicators" />, an applicator keyword may
                         refer to a schema to be applied, rather than including it as a
                         subschema in the applicator's value.  In such situations, the
-                        schema being applied is known as the referred schema, while
-                        the schema containing the applicator keyword is the referring schema.
+                        schema being applied is known as the referred (or referenced) schema,
+                        while the schema containing the applicator keyword is the referring
+                        (or referencing) schema.
                     </t>
                     <t>
                         While root schemas and subschemas are static concepts based on a
@@ -587,7 +588,7 @@
                     </t>
                     <t>
                         For some by-reference applicators, such as
-                        <xref target="ref">"$ref"</xref>, the referred schema can be determined
+                        <xref target="ref">"$ref"</xref>, the referenced schema can be determined
                         by static analysis of the schema document.  Others may take evaluation
                         context into account, and only be resolvable in the process of evaluating
                         with an instance.
@@ -953,20 +954,162 @@
                 </section>
             </section>
 
-            <section title='Schema References With "$ref"' anchor="ref">
+            <section title="Schema References">
                 <t>
-                    The "$ref" keyword can be used to reference a schema which is to be applied to the
-                    current instance location. "$ref" is an applicator key word, applying the referred
-                    schema to the instance.
+                    Several keywords can be used to reference a schema which is to be applied to the
+                    current instance location. "$ref" and "$recursiveRef" are an applicator
+                    keywords, applying the referred schema to the instance.  "$recursiveRoot"
+                    is a helper keyword that controls how the referred schema of "$recursiveRef"
+                    is determined.
                 </t>
+                <t>
+                    As the value of "$ref" and "$recursiveRef" are URI References, this allows
+                    the possibility to externalise or divide a schema across multiple files,
+                    and provides the ability to validate recursive structures through
+                    self-reference.
+                </t>
+                <t>
+                    The resolved URI produced by these keywords is not necessarily a network
+                    locator, only an identifier. A schema need not be downloadable from the
+                    address if it is a network-addressable URL, and implementations SHOULD NOT
+                    assume they should perform a network operation when they encounter
+                    a network-addressable URI.
+                </t>
+
+                <section title='Direct References with "$ref"' anchor="ref">
+                    <t>
+                        The "$ref" keyword is used to reference a statically identified schema.
+                    </t>
+                    <t>
+                        The value of the "$ref" property MUST be a string which is a URI Reference.
+                        Resolved against the current URI base, it identifies the URI of a schema
+                        to use.
+                    </t>
+                </section>
+
+                <section title='Recursive References with "$recursiveRefe" and "$recursiveRoot"'>
+                    <t>
+                        The "$recursiveRef" and "$recursiveRoot" keywords are used to construct
+                        extensible recursive schemas.
+                    </t>
+                    <t>
+                        Intuitively, when using "$ref" or another
+                        similar keyword to combine a recursive schema with another schema (recursive
+                        or otherwise), the goal of the schema author is often to have the
+                        recursion respect that combination.  The recursive reference would
+                        ideally always recurse to where the processing of the schema started.
+                    </t>
+                    <t>
+                        But this is not possible with the static behavior of "$ref", wich can
+                        only refer to the root schema of the current schema document.  It does
+                        not matter whether schema processing begain in that document or not.
+                    </t>
+                    <t>
+                        leading to verbose and error-prone re-definitions of each recursive
+                        element.
+                    </t>
+                    <figure>
+                        <preamble>
+                            Consider the following two schemas.  The first (given the id "basic")
+                            is an object with one string property and one reference property.
+                            The reference is recursive, pointing to the root of the current
+                            schema document.  The second schema references the first, and
+                            also describes a "things" property, which is an array of
+                            recursive references.
+                        </preamble>
+                        <artwork>
+<![CDATA[
+{
+    "$schema": "http://json-schema.org/draft-08/schema#",
+    "$id": "https://example.com/basic",
+    "$comment": "Referred schema for all $ref: # in this 'basic' file",
+    "properties": {
+        "name": {
+            "type": "string"
+        },
+        "recursive": {
+            "$ref": "#"
+        }
+    }
+}
+
+{
+    "$schema": "http://json-schema.org/draft-08/schema#",
+    "$id": "https://example.com/extension",
+    "$comment": "Referred schema for all $ref: # in this 'extension' file",
+    "$ref": "basic",
+    "properties": {
+        "things": {
+            "type": "array"
+            "items": {
+                "$ref": "#"
+            }
+        }
+    }
+}
+]]>
+                        </artwork>
+                        <postamble>
+                            The problem is that the referred targets of the 
+                            <spanx style="verb">"$ref": "#"</spanx>
+                            references are statically determined.  Since the
+                            <spanx style="verb">"things"</spanx> array is in the
+                            combined schema, its referred schema is the combined
+                            schema.  But the <spanx style="verb">"recursive"</spanx>
+                            property in the basic schema still points to the root
+                            of that basic schema.  What we want is for it to resolve
+                            to the combined schema, because that is the real entry point
+                            of processing.
+                        </postamble>
+                    </figure>
+                        schema is com
+
+For non-recursive schemas, using "allOf"
+                        or a similar keyword to combine schemas produces i
+                    </t>
+                    <t>
+                        This keyword's value MUST be the boolean literal true.
+                        <cref>
+                            Future drafts may extend the usage with other values.  The immediate
+                            use case does not require any targets other than the entry point
+                            root, and a regular fragment URI reference does not provide the
+                            correct semantics.  Should other values be added in the future,
+                            it is expected that a boolean true value will remain an alias for
+                            this original use case.
+                        </cref>
+                    </t>
+                    <t>
+                        The presence of this keyword with a boolean true value indicates that,
+                        during processing, it MUST be treated as a reference to the root of the
+                        <xref target="schema-document">schema document</xref> where processing
+                        was initiated.  The current base URI is not relevant to "$recurse".
+                    </t>
+                    <t>
+                        This document, known as the entry point schema, is the schema document that
+                        was initially supplied to the implementation, as opposed to schema documents
+                        that were processed as a result of following a "$ref" reference.  Note that
+                        even if processing began at a subschema within a document, the "$recurse"
+                        target MUST be the root schema.
+                    </t>
+                    <t>
+                        Aside from the dynamic definition of the reference target, a "$recurse"
+                        reference MUST behave identically to a "$ref" reference.
+                    </t>
+                </section>
+
+                <section title="Guarding Against Inifinite Recursion">
+                    <t>
+                        A schema MUST NOT be run into an infinite loop against an instance. For
+                        example, if two schemas "#alice" and "#bob" both have an "allOf" property
+                        that refers to the other, a naive validator might get stuck in an infinite
+                        recursive loop trying to validate the instance.  Schemas SHOULD NOT make
+                        use of infinite recursive nesting like this; the behavior is undefined.
+                    </t>
+                </section>
+            <section title='Schema References With "$ref"' anchor="ref">
                 <t>
                     The value of the "$ref" property MUST be a string which is a URI Reference.
                     Resolved against the current URI base, it identifies the URI of a schema to use.
-                </t>
-                <t>
-                    As the value of "$ref" is a URI Reference, this allows the possibility to externalise or
-                    divide a schema across multiple files, and provides the ability to validate recursive structures
-                    through self-reference.
                 </t>
                 <t>
                     The URI is not a network locator, only an identifier. A schema need not be
